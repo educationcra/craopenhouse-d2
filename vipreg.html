@@ -254,10 +254,8 @@
                                         <i class="fi fi-sr-angle-small-down text-slate-400"></i>
                                     </div>
                                     <div class="c-select-dropdown">
-                                         <div class="c-select-option" data-value="นาย"><i class="fi fi-sr-mars text-cra-400"></i><span>นาย</span></div>
+                                        <div class="c-select-option" data-value="นาย"><i class="fi fi-sr-mars text-cra-400"></i><span>นาย</span></div>
                                         <div class="c-select-option" data-value="นางสาว"><i class="fi fi-sr-venus text-pink-400"></i><span>นางสาว</span></div>
-                                        <div class="c-select-option" data-value="เด็กชาย"><i class="fi fi-sr-mars text-cra-400"></i><span>เด็กชาย</span></div>
-                                        <div class="c-select-option" data-value="เด็กหญิง"><i class="fi fi-sr-venus text-pink-400"></i><span>เด็กหญิง</span></div>
                                         <div class="c-select-option" data-value="Mr."><i class="fi fi-sr-mars text-cra-400"></i><span>Mr.</span></div>
                                         <div class="c-select-option" data-value="Ms."><i class="fi fi-sr-venus text-pink-400"></i><span>Ms.</span></div>
                                     </div>
@@ -295,7 +293,7 @@
                                 <label class="input-label">อีเมล<span class="req">*</span></label>
                                 <div class="input-container relative">
                                     <i class="fi fi-sr-envelope input-icon"></i>
-                                    <input type="email" id="email" class="input-field" placeholder="example@gmail.com" autocomplete="off" oninput="showEmailGuide(this)">
+                                    <input type="email" id="email" class="input-field" placeholder="example@gmail.com" autocomplete="off" oninput="formatEmail(this); showEmailGuide(this)">
                                     <ul id="emailDropdown" class="autocomplete-dropdown"></ul>
                                 </div>
                             </div>
@@ -718,7 +716,12 @@
             drop.innerHTML = emailDomains.map(d => `<li onclick="applyEmail('${val}${d}')"><span class="font-medium text-slate-800">${val}<b class="text-vip-500">${d}</b></span></li>`).join('');
             drop.style.display = 'block';
         }
+
         function applyEmail(fullEmail) { document.getElementById('email').value = fullEmail; document.getElementById('emailDropdown').style.display = 'none'; }
+
+        function formatEmail(el) {
+            el.value = el.value.replace(/[^a-zA-Z0-9@._-]/g, '');
+        }
 
         function formatPhone(el) {
             let v = el.value.replace(/\D/g,'');
