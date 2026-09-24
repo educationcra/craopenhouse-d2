@@ -565,19 +565,18 @@
 
             setupCustomSelects();
 
-            Promise.all([
-                fetch(SCRIPT_URL + "?action=getSchools").then(r => r.json()).catch(() => []),
-                fetch(SCRIPT_URL + "?action=getQuotas&type=vip").then(r => r.json()).catch(() => ({}))
-            ]).then(([schools, quotas]) => {
-                rawSchoolData = schools;
-                quotaData = quotas;
-                
+            // 🌟 แอบดึงข้อมูลไว้เบื้องหลัง (Background Fetching) เพื่อไม่ให้หน้าจอค้าง
+            fetch(SCRIPT_URL + "?action=getSchools").then(r => r.json()).then(data => rawSchoolData = data).catch(() => []);
+            fetch(SCRIPT_URL + "?action=getQuotas&type=vip").then(r => r.json()).then(data => quotaData = data).catch(() => ({}));
+
+            // 🌟 ปิดหน้าโหลดทันทีในเวลาเสี้ยววิ แล้วโชว์ PDPA เลย
+            setTimeout(() => {
                 document.getElementById('loadingScreen').classList.add('opacity-0');
                 setTimeout(() => { 
                     document.getElementById('loadingScreen').classList.add('hidden');
                     runPDPAFlow(); 
-                }, 500);
-            });
+                }, 300);
+            }, 400);
         };
 
         function runPDPAFlow() {
