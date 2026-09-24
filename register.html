@@ -224,6 +224,49 @@
         .step-dot.completed { background-color: #0ea5e9; color: white; border: none; transform: scale(1.05); }
         .step-line-bg { background: #f1f5f9; height: 8px; border-radius: 10px; width: 100%; position: relative;}
         .step-line-fill { background: linear-gradient(90deg, #1e3a8a, #0ea5e9, #10b981); height: 100%; border-radius: 10px; transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 0 15px rgba(14, 165, 233, 0.6); position: absolute; left: 0; top: 0;}
+        
+        /* Checkbox Wrapper 12 Style (Customized for CRA Theme) */
+        .checkbox-wrapper-12 { position: relative; }
+        .checkbox-wrapper-12 * { box-sizing: border-box; }
+        .checkbox-wrapper-12 input[type="checkbox"] {
+            -webkit-appearance: none; -moz-appearance: none; appearance: none;
+            -webkit-tap-highlight-color: transparent; cursor: pointer; margin: 0;
+        }
+        .checkbox-wrapper-12 input[type="checkbox"]:focus { outline: 0; }
+        .checkbox-wrapper-12 .cbx { width: 24px; height: 24px; position: relative; }
+        .checkbox-wrapper-12 .cbx input {
+            position: absolute; top: 0; left: 0; width: 24px; height: 24px;
+            border: 2px solid #cbd5e1; border-radius: 50%;
+        }
+        .checkbox-wrapper-12 .cbx label {
+            width: 24px; height: 24px; background: none; border-radius: 50%;
+            position: absolute; top: 0; left: 0; pointer-events: none;
+        }
+        .checkbox-wrapper-12 .cbx svg {
+            position: absolute; top: 5px; left: 4px; z-index: 1; pointer-events: none;
+        }
+        .checkbox-wrapper-12 .cbx svg path {
+            stroke: #fff; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round;
+            stroke-dasharray: 19; stroke-dashoffset: 19;
+            transition: stroke-dashoffset 0.3s ease; transition-delay: 0.2s;
+        }
+        .checkbox-wrapper-12 .cbx input:checked + label {
+            animation: splash-12 0.6s ease forwards;
+        }
+        .checkbox-wrapper-12 .cbx input:checked + label + svg path {
+            stroke-dashoffset: 0;
+        }
+        
+        @keyframes splash-12 {
+            40% {
+                background: #0ea5e9;
+                box-shadow: 0 -18px 0 -8px #0ea5e9, 16px -8px 0 -8px #0ea5e9, 16px 8px 0 -8px #0ea5e9, 0 18px 0 -8px #0ea5e9, -16px 8px 0 -8px #0ea5e9, -16px -8px 0 -8px #0ea5e9;
+            }
+            100% {
+                background: #0ea5e9;
+                box-shadow: 0 -36px 0 -10px transparent, 32px -16px 0 -10px transparent, 32px 16px 0 -10px transparent, 0 36px 0 -10px transparent, -32px 16px 0 -10px transparent, -32px -16px 0 -10px transparent;
+            }
+        }
     </style>
 </head>
 <body class="bg-slate-50 min-h-screen text-slate-800 flex flex-col relative overflow-x-hidden">
@@ -534,16 +577,21 @@
                         <!-- Survey -->
                         <h3 class="font-bold text-cra-900 mb-6 text-xl flex items-center"><i class="fi fi-sr-poll-h text-orange-500 mr-3 text-2xl"></i> แบบสำรวจเพิ่มเติม</h3>
                         
-                        <div class="input-wrapper mb-6">
-                            <label class="input-label">ทราบข่าวจากแหล่งใด<span class="req">*</span></label>
-                            <div class="c-select-container" id="c-source">
-                                <div class="c-select-trigger">
-                                    <div class="trigger-content"><i class="fi fi-sr-bullhorn trigger-icon"></i><span>เลือกแหล่งข่าว</span></div>
-                                    <i class="fi fi-sr-angle-small-down text-slate-400"></i>
-                                </div>
-                                <div class="c-select-dropdown" id="sourceList"></div>
+                        <div class="input-wrapper mb-8">
+                            <label class="input-label mb-4 text-lg">ท่านทราบข่าวเกี่ยวกับกิจกรรมจากแหล่งใด (ตอบได้มากกว่า 1 ข้อ)<span class="req">*</span></label>
+                            
+                            <!-- Grid สำหรับ Checkbox -->
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3" id="sourceCheckboxes">
+                                <!-- ตัวเลือกจะถูกสร้างอัตโนมัติด้วย JavaScript -->
                             </div>
-                            <input type="hidden" id="source" value="">
+
+                            <!-- ช่องกรอกข้อความเมื่อเลือก "อื่นๆ" -->
+                            <div id="otherSourceWrapper" class="mt-4 hidden animate-[fadeIn_0.3s_ease-out]">
+                                <div class="input-container">
+                                    <i class="fi fi-sr-edit input-icon"></i>
+                                    <input type="text" id="otherSourceInput" class="input-field border-cra-300 bg-cra-50 focus:bg-white" placeholder="โปรดระบุแหล่งที่มา...">
+                                </div>
+                            </div>
                         </div>
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-x-5 gap-y-2">
@@ -651,7 +699,22 @@
 
         const provincesList = ["กรุงเทพมหานคร","กระบี่","กาญจนบุรี","กาฬสินธุ์","กำแพงเพชร","ขอนแก่น","จันทบุรี","ฉะเชิงเทรา","ชลบุรี","ชัยนาท","ชัยภูมิ","ชุมพร","เชียงราย","เชียงใหม่","ตรัง","ตราด","ตาก","นครนายก","นครปฐม","นครพนม","นครราชสีมา","นครศรีธรรมราช","นครสวรรค์","นนทบุรี","นราธิวาส","น่าน","บึงกาฬ","บุรีรัมย์","ปทุมธานี","ประจวบคีรีขันธ์","ปราจีนบุรี","ปัตตานี","พระนครศรีอยุธยา","พะเยา","พังงา","พัทลุง","พิจิตร","พิษณุโลก","เพชรบุรี","เพชรบูรณ์","แพร่","ภูเก็ต","มหาสารคาม","มุกดาหาร","แม่ฮ่องสอน","ยโสธร","ยะลา","ร้อยเอ็ด","ระนอง","ระยอง","ราชบุรี","ลพบุรี","ลำปาง","ลำพูน","เลย","ศรีสะเกษ","สกลนคร","สงขลา","สตูล","สมุทรปราการ","สมุทรสงคราม","สมุทรสาคร","สระแก้ว","สระบุรี","สิงห์บุรี","สุโขทัย","สุพรรณบุรี","สุราษฎร์ธานี","สุรินทร์","หนองคาย","หนองบัวลำภู","อ่างทอง","อำนาจเจริญ","อุดรธานี","อุตรดิตถ์","อุทัยธานี","อุบลราชธานี"];
         const courseList = ['แพทยศาสตร์', 'พยาบาลศาสตร์', 'รังสีเทคนิค', 'วิทยาศาสตร์ข้อมูลสุขภาพ', 'วิทยาศาสตร์การเคลื่อนไหวและสุขภาพ', 'ฉุกเฉินการแพทย์', 'นวัตกรรมวิทยาศาสตร์การแพทย์', 'วิศวกรรมชีวการแพทย์', 'เทคโนโลยีอาหารทางการแพทย์และสุขภาพ'];
-        const sourceList = ["CRA Roadshow (ที่โรงเรียนของท่าน)", "Dek-D's TCAS Fair", "สื่อสังคมออนไลน์ราชวิทยาลัยจุฬาภรณ์ และ Education CRA", "เว็บไซต์ราชวิทยาลัยจุฬาภรณ์", "เพื่อน / คนรู้จัก / ครูแนะนำ", "แบนเนอร์ประชาสัมพันธ์"];
+        
+        // อัปเดตรายการตามภาพแบบ Multi-select
+        const sourceList = [
+            "กิจกรรม CRA Open House 2027",
+            "กิจกรรม CRA Roadshow (ที่โรงเรียนของท่าน)",
+            "กิจกรรม DEK-D's TCAS Fair ไบเทค บางนา",
+            "สื่อสังคมออนไลน์ Education CRA และสื่อราชวิทยาลัยจุฬาภรณ์",
+            "สื่อสังคมออนไลน์คณะ หลักสูตรต่าง ๆ ราชวิทยาลัยจุฬาภรณ์",
+            "สื่อโรงพยาบาลจุฬาภรณ์",
+            "เว็บไซต์ของราชวิทยาลัยจุฬาภรณ์",
+            "เว็บไซต์ข่าว/หนังสือพิมพ์ / วารสาร / โบว์ชัวร์",
+            "โทรทัศน์และวิทยุ",
+            "เพื่อน/คนรู้จัก/ครอบครัว/ครูที่โรงเรียน",
+            "อื่นๆ (ให้พิมพ์ระบุ)"
+        ];
+        
         const platformList = ['Facebook', 'Instagram', 'TikTok', 'X (Twitter)'];
         const emailDomains = ['@gmail.com', '@hotmail.com', '@outlook.co.th', '@yahoo.com'];
 
@@ -659,20 +722,39 @@
             // Populate Dropdowns statically first
             const provUI = document.getElementById('provinceList');
             provincesList.forEach(p => provUI.innerHTML += `<div class="c-select-option" data-value="${p}"><span>${p}</span></div>`);
+            
             const courseUI = document.getElementById('favcourseList');
             courseList.forEach(c => courseUI.innerHTML += `<div class="c-select-option" data-value="${c}"><span>${c}</span></div>`);
-            const srcUI = document.getElementById('sourceList');
-            sourceList.forEach(s => srcUI.innerHTML += `<div class="c-select-option" data-value="${s}"><span>${s}</span></div>`);
+            
             const platUI = document.getElementById('platformList');
             platformList.forEach(p => platUI.innerHTML += `<div class="c-select-option" data-value="${p}"><span>${p}</span></div>`);
 
+            // สร้าง UI สำหรับ Checkboxes แบบ Grid Cards
+            const srcUI = document.getElementById('sourceCheckboxes');
+            sourceList.forEach((s, idx) => {
+                srcUI.innerHTML += `
+                    <label class="flex items-center gap-4 p-4 border-2 border-slate-100 bg-white rounded-2xl cursor-pointer hover:border-cra-300 transition-all has-[:checked]:border-cra-500 has-[:checked]:bg-cra-50 has-[:checked]:shadow-sm group">
+                        <div class="checkbox-wrapper-12 shrink-0">
+                            <div class="cbx">
+                                <input type="checkbox" value="${s}" id="cbx-src-${idx}" class="source-checkbox" onchange="handleSourceChange(this)">
+                                <label for="cbx-src-${idx}"></label>
+                                <svg width="15" height="14" viewBox="0 0 15 14" fill="none">
+                                    <path d="M2 8.36364L6.23077 12L13 2"></path>
+                                </svg>
+                            </div>
+                        </div>
+                        <span class="text-sm font-bold text-slate-600 group-has-[:checked]:text-cra-800 leading-relaxed">${s}</span>
+                    </label>
+                `;
+            });
+
             setupCustomSelects();
 
-            // 🌟 แอบดึงข้อมูลไว้เบื้องหลัง (Background Fetching) เพื่อไม่ให้หน้าจอค้าง
+            // แอบดึงข้อมูลไว้เบื้องหลัง (Background Fetching)
             fetch(SCRIPT_URL + "?action=getSchools").then(r => r.json()).then(data => rawSchoolData = data).catch(() => []);
             fetch(SCRIPT_URL + "?action=getQuotas&type=normal").then(r => r.json()).then(data => quotaData = data).catch(() => ({}));
 
-            // 🌟 ปิดหน้าโหลดทันทีในเวลาเสี้ยววิ แล้วโชว์ PDPA เลย
+            // ปิดหน้าโหลดทันทีในเวลาเสี้ยววิ แล้วโชว์ PDPA
             setTimeout(() => {
                 document.getElementById('loadingScreen').classList.add('opacity-0');
                 setTimeout(() => { 
@@ -681,6 +763,20 @@
                 }, 300);
             }, 400);
         };
+
+        function handleSourceChange(el) {
+            if (el.value === "อื่นๆ (ให้พิมพ์ระบุ)") {
+                const otherWrap = document.getElementById('otherSourceWrapper');
+                const otherInput = document.getElementById('otherSourceInput');
+                if (el.checked) {
+                    otherWrap.classList.remove('hidden');
+                    otherInput.focus();
+                } else {
+                    otherWrap.classList.add('hidden');
+                    otherInput.value = '';
+                }
+            }
+        }
 
         function runPDPAFlow() {
             Swal.fire({
@@ -759,7 +855,7 @@
             document.getElementById('grade').value = val;
             Swal.fire({
                 title: 'คำแนะนำก่อนกรอก!', 
-                html: '<span class="text-slate-600 text-sm font-medium">โปรดกรอกเบอร์และอีเมลให้ถูกต้อง สมัครได้ 1 ชื่อ/1 เบอร์ ไม่สามารถลงซ้ำได้ หากพิมพ์ผิดสามารถกดแจ้งปัญหาที่หน้าแรกและหน้า E-PASS ได้เลยครับ</span>', 
+                html: '<span class="text-slate-600 text-sm font-medium">โปรดกรอกเบอร์และอีเมลให้ถูกต้อง สมัครได้ 1 ชื่อ/1 เบอร์ ไม่สามารถลงซ้ำได้ หากพิมพ์ผิดสามารถกดแจ้งปัญหาที่หน้า E-PASS ได้เลยครับ</span>', 
                 icon: 'info', 
                 confirmButtonText: 'รับทราบ',
                 confirmButtonColor: '#0ea5e9',
@@ -998,8 +1094,24 @@
 
         function submitForm() {
             if(!document.getElementById('groupVal').value) return Swal.fire({icon:'warning', text:'กรุณาเลือกกลุ่มเข้าฐาน 1 กลุ่มครับ'});
-            if(!document.getElementById('source').value || !document.getElementById('followPage').value) return Swal.fire({icon:'warning', text:'กรุณาตอบแบบสำรวจให้ครบถ้วน'});
-            if(document.getElementById('followPage').value === 'ติดตาม' && !document.getElementById('followPlatform').value) return Swal.fire({icon:'warning', text:'กรุณาเลือกแพลตฟอร์มที่ติดตาม'});
+            
+            // เช็ค Checkbox หลายข้อ และค่าอื่นๆ
+            const selectedSources = Array.from(document.querySelectorAll('.source-checkbox:checked')).map(cb => cb.value);
+            
+            if(selectedSources.length === 0 || !document.getElementById('followPage').value) {
+                return Swal.fire({icon:'warning', text:'กรุณาตอบแบบสำรวจให้ครบถ้วน'});
+            }
+
+            if(selectedSources.includes("อื่นๆ (ให้พิมพ์ระบุ)") && !document.getElementById('otherSourceInput').value.trim()) {
+                return Swal.fire({icon:'warning', text:'กรุณาระบุแหล่งที่มา (อื่นๆ)'});
+            }
+
+            if(document.getElementById('followPage').value === 'ติดตาม' && !document.getElementById('followPlatform').value) {
+                return Swal.fire({icon:'warning', text:'กรุณาเลือกแพลตฟอร์มที่ติดตาม'});
+            }
+
+            // นำ array ของ sources มารวมกันด้วย comma
+            let finalSource = selectedSources.map(s => s === "อื่นๆ (ให้พิมพ์ระบุ)" ? "อื่นๆ: " + document.getElementById('otherSourceInput').value.trim() : s).join(', ');
 
             const btn = document.getElementById('btnSubmit');
             const originHtml = btn.innerHTML;
@@ -1020,7 +1132,7 @@
                 favcourse: document.getElementById('favcourse').value,
                 route: 'Route ' + document.getElementById('routeVal').value,
                 group: document.getElementById('groupVal').value,
-                source: document.getElementById('source').value,
+                source: finalSource, // ส่งข้อมูลที่รวมกันแล้วไป
                 follow: document.getElementById('followPage').value,
                 platform: document.getElementById('followPage').value === 'ติดตาม' ? document.getElementById('followPlatform').value : '-'
             };
@@ -1043,7 +1155,7 @@
                     document.getElementById('epass-group').innerText = currentEpassData.group;
                     document.getElementById('epass-id').innerText = currentEpassData.id;
                     
-                    // 🌟 ดึง QR Code ผ่าน QuickChart โดยตรง ป้องกันปัญหาจาก Google Drive Viewer 🌟
+                    // ดึง QR Code ผ่าน QuickChart โดยตรง ป้องกันปัญหาจาก Google Drive Viewer
                     document.getElementById('epass-qr').src = "https://quickchart.io/qr?size=400x400&margin=2&text=" + encodeURIComponent(currentEpassData.id); 
                     
                     document.getElementById('successView').classList.remove('hidden');
