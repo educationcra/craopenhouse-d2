@@ -39,6 +39,11 @@
         
         /* Custom Select Style */
         select { -webkit-appearance: none; -moz-appearance: none; appearance: none; }
+
+        /* แก้ไขบัคกล้องไม่แสดงผล */
+        #reader { width: 100%; border-radius: 1rem; overflow: hidden; }
+        #reader video { object-fit: cover; border-radius: 1rem; width: 100%; }
+        #reader canvas { display: none !important; } /* ซ่อน canvas ที่ไม่จำเป็น */
     </style>
 </head>
 <body class="min-h-screen pb-10 relative">
@@ -50,7 +55,7 @@
     <div class="w-full h-2 bg-gradient-to-r from-sky-500 via-blue-500 to-emerald-400 fixed top-0 z-50"></div>
 
     <!-- Header -->
-    <header class="pt-8 pb-4 px-6 max-w-6xl mx-auto flex justify-between items-center">
+    <header class="pt-8 pb-4 px-6 max-w-7xl mx-auto flex justify-between items-center">
         <div class="flex items-center gap-4">
             <div class="w-12 h-12 bg-sky-500/10 rounded-xl flex items-center justify-center border border-sky-500/20">
                 <i class="fi fi-sr-id-badge text-2xl text-sky-400 mt-1"></i>
@@ -65,22 +70,24 @@
         </a>
     </header>
 
-    <main class="max-w-6xl mx-auto px-4 lg:px-6 lg:flex lg:gap-8 lg:items-start mt-4 relative z-10">
+    <main class="max-w-7xl mx-auto px-4 lg:px-6 lg:flex lg:gap-8 lg:items-start mt-4 relative z-10">
         
         <!-- LEFT PANEL: Stats & Scanner -->
         <div class="w-full lg:w-5/12 lg:sticky lg:top-8 flex flex-col gap-6 shrink-0">
             
-            <div class="grid grid-cols-2 gap-3">
+            <!-- Dashboard Stats -->
+            <div class="grid grid-cols-3 gap-3">
                 <div class="bg-slate-800 rounded-2xl p-4 text-center border border-slate-700 shadow-lg">
-                    <div class="text-[11px] text-slate-400 font-bold uppercase tracking-widest mb-1">ยอดสแกนล่าสุด</div>
-                    <div class="text-4xl font-black text-white" id="stat-arrived">0</div>
+                    <div class="text-[10px] md:text-[11px] text-slate-400 font-bold uppercase tracking-widest mb-1">ทั้งหมด</div>
+                    <div class="text-2xl md:text-3xl font-black text-white" id="stat-total">0</div>
                 </div>
-                <div class="bg-sky-500/10 rounded-2xl p-4 text-center border border-sky-500/20 shadow-lg relative overflow-hidden">
-                    <div class="absolute -right-2 -top-2 opacity-20"><i class="fi fi-sr-pulse text-4xl text-sky-400"></i></div>
-                    <div class="text-[11px] text-sky-400 font-bold uppercase tracking-widest mb-1 relative z-10">สถานะระบบ</div>
-                    <div class="text-xl font-black text-sky-400 relative z-10 mt-2 flex items-center justify-center gap-2">
-                        <div class="w-3 h-3 bg-sky-400 rounded-full animate-pulse"></div> ออนไลน์
-                    </div>
+                <div class="bg-emerald-500/10 rounded-2xl p-4 text-center border border-emerald-500/20 shadow-lg">
+                    <div class="text-[10px] md:text-[11px] text-emerald-400 font-bold uppercase tracking-widest mb-1">เช็คอินแล้ว</div>
+                    <div class="text-2xl md:text-3xl font-black text-emerald-400" id="stat-arrived">0</div>
+                </div>
+                <div class="bg-slate-800 rounded-2xl p-4 text-center border border-slate-700 shadow-lg opacity-80">
+                    <div class="text-[10px] md:text-[11px] text-slate-500 font-bold uppercase tracking-widest mb-1">ยังไม่มา</div>
+                    <div class="text-2xl md:text-3xl font-black text-slate-400" id="stat-pending">0</div>
                 </div>
             </div>
 
@@ -98,7 +105,24 @@
                 
                 <!-- Camera View -->
                 <div id="scan-panel" class="flex flex-col items-center">
-                    <div id="reader" class="w-full bg-slate-900 rounded-2xl overflow-hidden border-2 border-slate-700 shadow-inner min-h-[250px]"></div>
+                    
+                    <!-- Camera Toggle Button -->
+                    <div class="w-full mb-4">
+                        <button id="cam-toggle-btn" onclick="toggleCamera()" class="w-full py-3 rounded-xl bg-emerald-600/20 border border-emerald-500/30 text-emerald-400 hover:bg-emerald-600/30 font-bold transition flex items-center justify-center gap-2">
+                            <i class="fi fi-sr-play-alt" id="cam-icon"></i> <span id="cam-text">เปิดการใช้งานกล้อง</span>
+                        </button>
+                    </div>
+
+                    <!-- แก้ไขโครงสร้างไม่ให้ใช้ flex ตรงนี้ เพื่อให้วิดีโอขยายตัวได้เต็มที่ -->
+                    <div id="reader-container" class="w-full relative bg-slate-900 rounded-2xl overflow-hidden border-2 border-slate-700 shadow-inner min-h-[300px]">
+                        <!-- Placeholder when cam is off (อยู่ด้านบนสุดเมื่อไม่ได้เปิดกล้อง) -->
+                        <div id="cam-off-placeholder" class="absolute inset-0 flex flex-col items-center justify-center text-slate-500 bg-slate-900 z-10">
+                            <i class="fi fi-sr-eye-crossed text-4xl mb-2"></i>
+                            <p class="font-bold text-sm">กล้องปิดอยู่</p>
+                        </div>
+                        <!-- Actual Reader (กล่องรับวิดีโอ) -->
+                        <div id="reader" class="w-full h-full relative z-0"></div>
+                    </div>
                     <p class="text-slate-400 text-sm font-bold mt-4 text-center"><i class="fi fi-sr-info"></i> นำกล้องส่องที่ QR Code ใน E-PASS</p>
                 </div>
 
@@ -120,7 +144,7 @@
                         
                         <span class="text-slate-500">-G</span>
                         <div class="relative">
-                            <select id="manual-group" class="w-16 bg-slate-800 text-sky-400 text-center rounded-xl border border-slate-600 outline-none py-2.5 cursor-pointer appearance-none shadow-sm transition focus:border-sky-500" id="manual-group-select"></select>
+                            <select id="manual-group" class="w-16 bg-slate-800 text-sky-400 text-center rounded-xl border border-slate-600 outline-none py-2.5 cursor-pointer appearance-none shadow-sm transition focus:border-sky-500"></select>
                         </div>
                     </div>
                     
@@ -133,26 +157,36 @@
         
         <!-- RIGHT PANEL: Live Attendee List -->
         <div class="w-full lg:w-7/12 mt-8 lg:mt-0">
-            <div class="bg-slate-800 border border-slate-700 rounded-3xl p-6 shadow-xl flex flex-col h-[650px]">
+            <div class="bg-slate-800 border border-slate-700 rounded-3xl p-6 shadow-xl flex flex-col h-[750px]">
                 
-                <div class="flex justify-between items-center mb-6 border-b border-slate-700 pb-4">
+                <div class="flex flex-col md:flex-row justify-between md:items-center gap-4 mb-6 border-b border-slate-700 pb-4">
                     <h2 class="text-lg md:text-xl font-black text-white flex items-center gap-3">
-                        <i class="fi fi-sr-list-check text-sky-400"></i> ประวัติการสแกนล่าสุด
+                        <i class="fi fi-sr-users-alt text-sky-400"></i> รายชื่อผู้เข้าร่วมทั้งหมด
                     </h2>
-                    <button onclick="fetchAttendees()" class="text-sm text-slate-300 hover:text-white transition bg-slate-700 hover:bg-slate-600 px-4 py-2.5 rounded-xl flex items-center gap-2 font-bold shadow-sm">
-                        <i class="fi fi-sr-refresh mt-0.5"></i> ซิงค์ข้อมูล
-                    </button>
+                    
+                    <div class="flex items-center gap-2">
+                        <!-- Search Box -->
+                        <div class="relative flex-grow">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fi fi-sr-search text-slate-400"></i>
+                            </div>
+                            <input type="text" id="searchInput" onkeyup="filterList()" placeholder="ค้นหาชื่อ หรือ รหัส..." class="w-full bg-slate-900 text-white text-sm rounded-xl border border-slate-700 outline-none focus:border-sky-500 py-2.5 pl-10 pr-4 shadow-inner transition">
+                        </div>
+                        <button onclick="fetchAttendees()" class="text-sm text-slate-300 hover:text-white transition bg-slate-700 hover:bg-slate-600 px-4 py-2.5 rounded-xl flex items-center gap-2 font-bold shadow-sm shrink-0">
+                            <i class="fi fi-sr-refresh mt-0.5"></i> ซิงค์
+                        </button>
+                    </div>
                 </div>
                 
                 <div class="flex-grow overflow-auto dash-scroll pr-2 relative">
-                    <div id="loadingList" class="absolute inset-0 flex flex-col items-center justify-center text-slate-500 bg-slate-800/80 backdrop-blur-sm z-10 hidden">
+                    <div id="loadingList" class="absolute inset-0 flex flex-col items-center justify-center text-slate-500 bg-slate-800/80 backdrop-blur-sm z-10 hidden rounded-xl">
                         <i class="fi fi-sr-spinner animate-spin text-4xl mb-4 text-sky-500"></i>
                         <p class="font-bold text-sky-400 tracking-wider">กำลังโหลดข้อมูล...</p>
                     </div>
 
                     <div id="attendee-list" class="space-y-3">
                         <div class="text-center py-20 text-slate-500 font-bold border-2 border-dashed border-slate-700 rounded-2xl">
-                            <i class="fi fi-sr-box-open text-4xl mb-3 block"></i> ยังไม่มีประวัติการเช็คอิน
+                            <i class="fi fi-sr-cloud-download-alt text-4xl mb-3 block"></i> กรุณากดซิงค์เพื่อโหลดรายชื่อ
                         </div>
                     </div>
                 </div>
@@ -165,16 +199,18 @@
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx792pTv4hvqt2tsQA3_Dv4sodtm1U67XOtTTvW5YpgoFIIuTxbNQFdQHGFlcd8HUBiIw/exec"; 
         
         let html5QrcodeScanner = null;
-        let dashInterval = null;
+        let isCameraActive = false;
+        let isProcessingScan = false; // ป้องกันสแกนรัวๆ แทนการใช้ pause()
         let highlightId = null;
+        let allAttendeesData = []; 
 
         window.onload = () => {
-            // Generate Group Options 1-12
             const groupSelect = document.getElementById('manual-group');
             for(let i = 1; i <= 12; i++) {
                 groupSelect.innerHTML += `<option value="${i}">${i}</option>`;
             }
             switchTab('scan');
+            fetchAttendees(); 
         };
 
         function switchTab(tab) {
@@ -183,27 +219,90 @@
                 document.getElementById('manual-panel').classList.add('hidden');
                 document.getElementById('tab-scan').className = "flex-1 py-2.5 rounded-xl bg-sky-600 text-white font-bold transition flex items-center justify-center gap-2 shadow-md";
                 document.getElementById('tab-manual').className = "flex-1 py-2.5 rounded-xl text-slate-400 font-bold hover:bg-slate-700 transition flex items-center justify-center gap-2";
-                
-                if(!html5QrcodeScanner) {
-                    html5QrcodeScanner = new Html5Qrcode("reader");
-                }
-                if(html5QrcodeScanner.getState() !== 2) {
-                    html5QrcodeScanner.start({ facingMode: "environment" }, { fps: 10, qrbox: { width: 250, height: 250 } }, onScanSuccess).catch(e => console.log(e));
-                }
             } else {
                 document.getElementById('scan-panel').classList.add('hidden');
                 document.getElementById('manual-panel').classList.remove('hidden');
                 document.getElementById('tab-manual').className = "flex-1 py-2.5 rounded-xl bg-sky-600 text-white font-bold transition flex items-center justify-center gap-2 shadow-md";
                 document.getElementById('tab-scan').className = "flex-1 py-2.5 rounded-xl text-slate-400 font-bold hover:bg-slate-700 transition flex items-center justify-center gap-2";
                 
-                if(html5QrcodeScanner && html5QrcodeScanner.isScanning) {
-                    html5QrcodeScanner.stop().catch(e => console.log("Failed to stop scanner", e));
+                // ปิดกล้องถ้าสลับไปหน้าพิมพ์รหัส
+                if(isCameraActive) {
+                    toggleCamera(); 
                 }
             }
         }
 
+        function toggleCamera() {
+            const btn = document.getElementById('cam-toggle-btn');
+            const icon = document.getElementById('cam-icon');
+            const text = document.getElementById('cam-text');
+            const placeholder = document.getElementById('cam-off-placeholder');
+
+            // ป้องกันการกดรัวๆ
+            if(btn.disabled) return;
+            btn.disabled = true;
+
+            if (!html5QrcodeScanner) {
+                html5QrcodeScanner = new Html5Qrcode("reader");
+            }
+
+            if (!isCameraActive) {
+                // เปลี่ยน UI เป็นกำลังโหลด
+                btn.className = "w-full py-3 rounded-xl bg-slate-700 border border-slate-600 text-slate-300 font-bold transition flex items-center justify-center gap-2 cursor-wait";
+                icon.className = "fi fi-sr-spinner animate-spin";
+                text.innerText = "กำลังเปิดกล้อง...";
+                
+                placeholder.classList.add('hidden'); // ซ่อน placeholder เผยให้เห็น reader 
+
+                html5QrcodeScanner.start(
+                    { facingMode: "environment" }, 
+                    { fps: 10, qrbox: { width: 250, height: 250 } }, 
+                    onScanSuccess
+                ).then(() => {
+                    isCameraActive = true;
+                    btn.disabled = false;
+                    btn.className = "w-full py-3 rounded-xl bg-red-600/20 border border-red-500/30 text-red-400 hover:bg-red-600/30 font-bold transition flex items-center justify-center gap-2";
+                    icon.className = "fi fi-sr-stop";
+                    text.innerText = "ปิดการใช้งานกล้อง";
+                }).catch(e => {
+                    console.log("Error starting camera", e);
+                    Swal.fire('ข้อผิดพลาด', 'ไม่สามารถเข้าถึงกล้องได้ กรุณาตรวจสอบการอนุญาตใช้งานกล้อง', 'error');
+                    resetCameraUI();
+                });
+
+            } else {
+                // เปลี่ยน UI เป็นกำลังโหลด
+                btn.className = "w-full py-3 rounded-xl bg-slate-700 border border-slate-600 text-slate-300 font-bold transition flex items-center justify-center gap-2 cursor-wait";
+                icon.className = "fi fi-sr-spinner animate-spin";
+                text.innerText = "กำลังปิดกล้อง...";
+
+                html5QrcodeScanner.stop().then(() => {
+                    resetCameraUI();
+                    html5QrcodeScanner.clear(); // ล้างข้อมูลเดิมทิ้ง ป้องกันภาพค้าง
+                }).catch(e => {
+                    console.log("Failed to stop scanner", e);
+                    resetCameraUI(); 
+                });
+            }
+        }
+
+        function resetCameraUI() {
+            const btn = document.getElementById('cam-toggle-btn');
+            const icon = document.getElementById('cam-icon');
+            const text = document.getElementById('cam-text');
+            const placeholder = document.getElementById('cam-off-placeholder');
+
+            isCameraActive = false;
+            btn.disabled = false;
+            placeholder.classList.remove('hidden'); // ปิดหน้ากล้องด้วย placeholder
+            
+            btn.className = "w-full py-3 rounded-xl bg-emerald-600/20 border border-emerald-500/30 text-emerald-400 hover:bg-emerald-600/30 font-bold transition flex items-center justify-center gap-2";
+            icon.className = "fi fi-sr-play-alt";
+            text.innerText = "เปิดการใช้งานกล้อง";
+        }
+
         function onScanSuccess(decodedText) {
-            if(html5QrcodeScanner.getState() === 2) html5QrcodeScanner.pause();
+            if(isProcessingScan) return; // ถ้ากำลังโหลดอยู่ ให้เมินค่าที่สแกนได้ซ้ำ
             processCheckin(decodedText);
         }
 
@@ -211,7 +310,6 @@
             let num = document.getElementById('manual-num').value.trim();
             if(!num) return Swal.fire({icon: 'warning', title: 'ข้อมูลไม่ครบ', text: 'กรุณาพิมพ์ตัวเลข ID 3 หลัก', customClass: {popup: 'modern-popup'}});
             
-            // เติม 0 ให้ครบ 3 หลักอัตโนมัติ
             num = num.padStart(3, '0');
             document.getElementById('manual-num').value = num;
 
@@ -223,6 +321,7 @@
         }
 
         function processCheckin(idSearch) {
+            isProcessingScan = true; // ล็อกไม่ให้สแกนซ้ำ
             Swal.fire({ title: 'กำลังตรวจสอบ...', allowOutsideClick: false, didOpen: () => { Swal.showLoading() }, customClass: {popup: 'modern-popup bg-slate-800 text-white'} });
             
             fetch(SCRIPT_URL, {
@@ -232,22 +331,19 @@
                 if(res.status === 'success') {
                     Swal.fire({icon: 'success', title: 'เช็คอินสำเร็จ!', html: `<span class="text-sky-400 font-bold text-xl">${res.name}</span><br>กลุ่ม ${res.group}`, timer: 2000, showConfirmButton: false, customClass: {popup: 'modern-popup bg-slate-800 text-white border border-sky-500/30'}});
                     highlightId = idSearch;
-                    fetchAttendees();
+                    fetchAttendees(); 
                 } else if(res.status === 'already') {
                     Swal.fire({icon: 'warning', title: 'เช็คอินซ้ำ!', html: `<span class="text-orange-400 font-bold">${res.name}</span><br>สแกนไปแล้วเมื่อ ${res.time}`, timer: 3000, showConfirmButton: false, customClass: {popup: 'modern-popup bg-slate-800 text-white border border-orange-500/30'}});
                 } else {
                     Swal.fire({icon: 'error', title: 'ไม่พบข้อมูล', text: res.message, customClass: {popup: 'modern-popup bg-slate-800 text-white border border-red-500/30'}});
                 }
                 
-                // ล้างช่อง input
                 document.getElementById('manual-num').value = '';
                 
-                setTimeout(() => { 
-                    if(html5QrcodeScanner && html5QrcodeScanner.getState() === 2) html5QrcodeScanner.resume(); 
-                }, 2000);
+                setTimeout(() => { isProcessingScan = false; }, 2000); // ปลดล็อกหลังโชว์แจ้งเตือนเสร็จ
             }).catch(e => {
                 Swal.fire('Error', 'ระบบขัดข้อง กรุณาลองใหม่', 'error');
-                setTimeout(() => { if(html5QrcodeScanner && html5QrcodeScanner.getState() === 2) html5QrcodeScanner.resume(); }, 2000);
+                setTimeout(() => { isProcessingScan = false; }, 2000);
             });
         }
 
@@ -262,56 +358,135 @@
                 .then(res => {
                     loading.classList.add('hidden');
                     if(res.status === 'success') {
-                        let arrivedData = res.data; // Dashboard GS returns 20 latest arrived
-                        document.getElementById('stat-arrived').textContent = arrivedData.length;
-
-                        if(arrivedData.length === 0) {
-                            listContainer.innerHTML = `<div class="text-center py-20 text-slate-500 font-bold border-2 border-dashed border-slate-700 rounded-2xl"><i class="fi fi-sr-box-open text-4xl mb-3 block"></i> ยังไม่มีประวัติการเช็คอิน</div>`;
-                            return;
-                        }
-
-                        let html = '';
-                        arrivedData.forEach(item => {
-                            const isHighlight = item.id === highlightId;
-                            let stateClass = "bg-sky-500/10 border-sky-500/30";
-                            if (isHighlight) stateClass += " highlight-row";
-
-                            html += `
-                                <div id="row-${item.id}" class="flex items-center justify-between p-4 rounded-2xl border transition-all duration-300 ${stateClass}">
-                                    <div class="flex items-center gap-4">
-                                        <div class="w-12 h-12 rounded-xl flex flex-col items-center justify-center shrink-0 bg-sky-500/20 border border-sky-500/20">
-                                            <span class="font-black text-base text-sky-400">${item.id.replace(/^OH\d{3}/, '')}</span>
-                                        </div>
-                                        <div>
-                                            <h3 class="font-bold text-lg md:text-xl text-white leading-tight">${item.name}</h3>
-                                            <div class="flex gap-2 mt-1 items-center">
-                                                <span class="text-xs text-sky-400 font-bold bg-sky-500/20 px-2 py-0.5 rounded uppercase">${item.id}</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="pr-2 text-right">
-                                        <i class="fi fi-sr-check-circle text-emerald-400 text-2xl mb-1 block"></i>
-                                        <span class="text-[10px] text-slate-400 font-bold block">${item.time.substring(11, 16)}</span>
-                                    </div>
-                                </div>
-                            `;
-                        });
-                        
-                        listContainer.innerHTML = html;
-                        
-                        if(highlightId) {
-                            const el = document.getElementById('row-' + highlightId);
-                            if(el) {
-                                setTimeout(() => { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
-                                setTimeout(() => { highlightId = null; }, 3000);
-                            }
-                        }
+                        allAttendeesData = res.data; 
+                        renderList(allAttendeesData);
                     }
                 })
                 .catch(err => {
                     loading.classList.add('hidden');
                     console.log(err);
                 });
+        }
+
+        function renderList(dataArray) {
+            const listContainer = document.getElementById('attendee-list');
+            
+            // คำนวณสถิติ
+            let total = dataArray.length;
+            let arrivedCount = 0;
+            
+            dataArray.forEach(item => {
+                let timeStr = (item.time || "").toString().trim();
+                if(timeStr !== "" && timeStr !== "-") arrivedCount++;
+            });
+            
+            let pendingCount = total - arrivedCount;
+
+            document.getElementById('stat-total').textContent = total;
+            document.getElementById('stat-arrived').textContent = arrivedCount;
+            document.getElementById('stat-pending').textContent = pendingCount;
+
+            if(dataArray.length === 0) {
+                listContainer.innerHTML = `<div class="text-center py-20 text-slate-500 font-bold border-2 border-dashed border-slate-700 rounded-2xl"><i class="fi fi-sr-box-open text-4xl mb-3 block"></i> ยังไม่มีประวัติการเช็คอิน</div>`;
+                return;
+            }
+
+            let html = '';
+            dataArray.forEach(item => {
+                const isHighlight = item.id === highlightId;
+                let timeStr = (item.time || "").toString().trim();
+                const isArrived = (timeStr !== "" && timeStr !== "-");
+                
+                let routeGroup = "";
+                const rgMatch = item.id.match(/(R\d+-G\d+)/);
+                if (rgMatch) {
+                    let rgParts = rgMatch[1].split('-');
+                    routeGroup = `${rgParts[0]}-<br>${rgParts[1]}`;
+                } else {
+                    routeGroup = item.id.replace(/^OH\d{3}/, ''); 
+                }
+
+                let displayTime = "2026"; 
+                if (timeStr.includes(':')) {
+                    let timeMatch = timeStr.match(/\d{2}:\d{2}/);
+                    if(timeMatch) displayTime = timeMatch[0]; 
+                }
+
+                if (isArrived) {
+                    let highlightClass = isHighlight ? "highlight-row" : "";
+                    html += `
+                        <div id="row-${item.id}" class="flex items-center justify-between p-4 rounded-2xl border border-sky-900/50 bg-[#1e293b] shadow-sm transition-all duration-300 ${highlightClass}">
+                            <div class="flex items-center gap-4">
+                                <div class="w-14 h-14 rounded-xl flex flex-col items-center justify-center shrink-0 bg-sky-500/20">
+                                    <span class="font-black text-sm md:text-base text-sky-400 leading-tight text-center">${routeGroup}</span>
+                                </div>
+                                <div class="flex flex-col justify-center">
+                                    <h3 class="font-black text-lg md:text-xl text-white mb-1 leading-tight tracking-wide">${item.name}</h3>
+                                    <div class="flex">
+                                        <span class="text-[11px] text-sky-300 bg-sky-500/20 font-bold px-2 py-0.5 rounded uppercase tracking-wider">${item.id}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex flex-col items-end justify-center pr-1">
+                                <div class="w-8 h-8 rounded-full bg-emerald-400 flex items-center justify-center mb-1 shadow-md shadow-emerald-400/20">
+                                    <i class="fi fi-sr-check text-slate-900 text-sm mt-0.5"></i>
+                                </div>
+                                <span class="text-[10px] text-emerald-400 font-bold">${displayTime}</span>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    html += `
+                        <div id="row-${item.id}" class="flex items-center justify-between p-4 rounded-2xl border border-slate-800 bg-[#0f172a] opacity-60 hover:opacity-100 transition-all duration-300">
+                            <div class="flex items-center gap-4">
+                                <div class="w-14 h-14 rounded-xl flex flex-col items-center justify-center shrink-0 bg-slate-800">
+                                    <span class="font-black text-sm md:text-base text-slate-500 leading-tight text-center">${routeGroup}</span>
+                                </div>
+                                <div class="flex flex-col justify-center">
+                                    <h3 class="font-bold text-lg md:text-xl text-slate-400 mb-1 leading-tight tracking-wide">${item.name}</h3>
+                                    <div class="flex">
+                                        <span class="text-[11px] text-slate-500 bg-slate-800 font-bold px-2 py-0.5 rounded uppercase tracking-wider">${item.id}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex flex-col items-end justify-center pr-1">
+                                <div class="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center mb-1">
+                                    <i class="fi fi-sr-minus text-slate-400 text-sm mt-0.5"></i>
+                                </div>
+                                <span class="text-[10px] text-slate-500 font-bold tracking-wider">PENDING</span>
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+            
+            listContainer.innerHTML = html;
+            
+            if(highlightId) {
+                const el = document.getElementById('row-' + highlightId);
+                if(el) {
+                    setTimeout(() => { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 300);
+                    setTimeout(() => { highlightId = null; }, 3000);
+                }
+            }
+        }
+
+        function filterList() {
+            let input = document.getElementById("searchInput").value.toLowerCase();
+            if(!input) {
+                renderList(allAttendeesData);
+                return;
+            }
+            
+            let filtered = allAttendeesData.filter(item => {
+                return (item.name && item.name.toLowerCase().includes(input)) || 
+                       (item.id && item.id.toLowerCase().includes(input));
+            });
+            
+            let tempHighlight = highlightId;
+            highlightId = null;
+            renderList(filtered);
+            highlightId = tempHighlight;
         }
     </script>
 </body>
