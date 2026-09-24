@@ -1,0 +1,1134 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ลงทะเบียนเข้าร่วมงาน - CRA OPENHOUSE 2027</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel='stylesheet' href='https://cdn-uicons.flaticon.com/2.1.0/uicons-solid-rounded/css/uicons-solid-rounded.css'>
+    
+    <!-- เพิ่ม Library สำหรับแปลงหน้าจอเป็นรูปภาพ (ดาวน์โหลด E-PASS) -->
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        cra: { 
+                            50: '#f0f9ff', 100: '#e0f2fe', 200: '#bae6fd', 300: '#7dd3fc', 
+                            400: '#38bdf8', 500: '#0ea5e9', 600: '#0284c7', 700: '#0369a1', 
+                            800: '#075985', 900: '#1e3a8a'
+                        },
+                        mint: { 50: '#ecfdf5', 100: '#d1fae5', 400: '#34d399', 500: '#10b981', 600: '#059669' },
+                        orange: { 50: '#fff7ed', 100: '#ffedd5', 500: '#f97316', 600: '#ea580c' }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body { font-family: 'Noto Sans Thai', sans-serif; -webkit-tap-highlight-color: transparent; background-color: #f8fafc; }
+        
+        .main-container { background: #ffffff; border-radius: 2.5rem; box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.05); border: 1px solid #f1f5f9; position: relative; z-index: 1; }
+        
+        /* Animations */
+        .step-section { display: none; opacity: 0; transform: translateX(0); }
+        .step-section.visible { display: flex; flex-direction: column; }
+        @keyframes stepInRight { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+        @keyframes stepInLeft { from { opacity: 0; transform: translateX(-20px); } to { opacity: 1; transform: translateX(0); } }
+        .ani-next { animation: stepInRight 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
+        .ani-prev { animation: stepInLeft 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
+        
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Floating Background Icons */
+        .floating-bg { position: fixed; inset: 0; overflow: hidden; pointer-events: none; z-index: -40; }
+        .float-icon { position: absolute; bottom: -10%; opacity: 0; color: rgba(30, 58, 138, 0.04); animation: floatUp linear infinite; }
+        @keyframes floatUp {
+            0% { transform: translateY(10vh) rotate(0deg) scale(0.8); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(-110vh) rotate(360deg) scale(1.5); opacity: 0; }
+        }
+
+        /* Modern Input Glass */
+        .input-wrapper { margin-bottom: 1.5rem; position: relative; }
+        .input-label { display: flex; align-items: center; gap: 0.5rem; font-size: 0.95rem; font-weight: 700; color: #1e3a8a; margin-bottom: 0.6rem; }
+        .req { color: #f97316; }
+        
+        .input-container { position: relative; width: 100%; }
+        .input-icon { position: absolute; top: 50%; transform: translateY(-50%); left: 1.25rem; color: #94a3b8; font-size: 1.15rem; pointer-events: none; transition: color 0.2s;}
+        
+        .input-field { 
+            width: 100%; padding: 1.125rem 1.25rem 1.125rem 3.25rem; border-radius: 1.25rem; 
+            border: 2px solid #e2e8f0; background: #ffffff; 
+            outline: none; transition: all 0.25s ease; 
+            font-weight: 600; color: #0f172a; font-size: 0.95rem; 
+        }
+        .input-field:focus { border-color: #0ea5e9; box-shadow: 0 4px 20px rgba(14, 165, 233, 0.1); background-color: #f0f9ff; }
+        .input-field:focus + .input-icon, .input-container:focus-within .input-icon { color: #0ea5e9; }
+        .input-field::placeholder { color: #cbd5e1; font-weight: 500; }
+
+        /* Custom Dropdown Universal */
+        .c-select-container { position: relative; width: 100%; user-select: none; z-index: 10; }
+        .c-select-container.open { z-index: 50; }
+        .c-select-trigger { 
+            width: 100%; padding: 1.125rem 1.25rem; border-radius: 1.25rem; 
+            border: 2px solid #e2e8f0; background: #ffffff; 
+            display: flex; justify-content: space-between; align-items: center; 
+            cursor: pointer; transition: all 0.25s ease; 
+            font-weight: 600; color: #94a3b8; font-size: 0.95rem; 
+        }
+        .c-select-trigger.has-value { color: #0f172a; border-color: #e2e8f0; }
+        .c-select-trigger:focus, .c-select-container.open .c-select-trigger { 
+            border-color: #0ea5e9; box-shadow: 0 4px 20px rgba(14, 165, 233, 0.1); background-color: #f0f9ff;
+        }
+        .trigger-content { display: flex; align-items: center; gap: 0.75rem; }
+        .trigger-icon { color: #94a3b8; font-size: 1.1rem; display: flex; align-items: center; transition: color 0.2s; }
+        .c-select-trigger.has-value .trigger-icon { color: #0ea5e9; }
+        .c-select-container.open .trigger-icon { color: #0ea5e9; }
+
+        .c-select-dropdown { 
+            position: absolute; top: calc(100% + 8px); left: 0; right: 0; 
+            background: #fff; border: 2px solid #e2e8f0; border-radius: 1.25rem; 
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); z-index: 999; 
+            max-height: 250px; overflow-y: auto; opacity: 0; visibility: hidden; 
+            transform: translateY(-10px); transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); 
+        }
+        .c-select-container.open .c-select-dropdown { opacity: 1; visibility: visible; transform: translateY(0); }
+        .c-select-option { display: flex; align-items: center; gap: 0.75rem; padding: 1rem 1.25rem; font-weight: 600; color: #475569; cursor: pointer; transition: 0.15s; border-bottom: 1px solid #f8fafc; }
+        .c-select-option:hover { background: #f0f9ff; color: #0ea5e9; padding-left: 1.5rem; }
+        .c-select-option.selected { background: #e0f2fe; color: #0369a1; font-weight: 700; border-left: 4px solid #0ea5e9; padding-left: 1rem;}
+
+        /* Autocomplete */
+        .autocomplete-dropdown { 
+            position: absolute; z-index: 999; width: 100%; background: #fff; 
+            border: 2px solid #e2e8f0; border-radius: 1.25rem; max-height: 250px; 
+            overflow-y: auto; display: none; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.15); margin-top: 8px; 
+        }
+        .autocomplete-dropdown li { padding: 1rem 1.25rem; border-bottom: 1px solid #f8fafc; cursor: pointer; transition: 0.2s; font-size: 0.95rem; color: #475569; font-weight: 600; display: flex; justify-content: space-between;}
+        .autocomplete-dropdown li:hover { background-color: #f0f9ff; color: #0ea5e9; padding-left: 1.5rem; }
+
+        .loader {
+            --color-one: #ffbf48;
+            --color-two: #be4a1d;
+            --color-three: #ffbf4780;
+            --color-four: #bf4a1d80;
+            --color-five: #ffbf4740;
+            --time-animation: 2s;
+            --size: 0.85; 
+            position: relative;
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            transform: scale(var(--size));
+            box-shadow: 0 0 25px 0 var(--color-three), 0 20px 50px 0 var(--color-four);
+            animation: colorize calc(var(--time-animation) * 3) ease-in-out infinite;
+            margin: 0 auto 1.5rem auto;
+        }
+
+        .loader::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            border-top: solid 1px var(--color-one);
+            border-bottom: solid 1px var(--color-two);
+            background: linear-gradient(180deg, var(--color-five), var(--color-four));
+            box-shadow: inset 0 10px 10px 0 var(--color-three), inset 0 -10px 10px 0 var(--color-four);
+        }
+
+        .loader .box {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(180deg, var(--color-one) 30%, var(--color-two) 70%);
+            mask: url(#mask-clipping);
+            -webkit-mask: url(#mask-clipping);
+        }
+
+        .loader svg {
+            position: absolute;
+            width: 0;
+            height: 0;
+        }
+
+        .loader svg #clipping {
+            filter: contrast(15);
+            animation: roundness calc(var(--time-animation) / 2) linear infinite;
+        }
+
+        .loader svg #clipping polygon {
+            filter: blur(7px);
+        }
+
+        .loader svg #clipping polygon:nth-child(1) { transform-origin: 75% 25%; transform: rotate(90deg); }
+        .loader svg #clipping polygon:nth-child(2) { transform-origin: 50% 50%; animation: rotation var(--time-animation) linear infinite reverse; }
+        .loader svg #clipping polygon:nth-child(3) { transform-origin: 50% 60%; animation: rotation var(--time-animation) linear infinite; animation-delay: calc(var(--time-animation) / -3); }
+        .loader svg #clipping polygon:nth-child(4) { transform-origin: 40% 40%; animation: rotation var(--time-animation) linear infinite reverse; }
+        .loader svg #clipping polygon:nth-child(5) { transform-origin: 40% 40%; animation: rotation var(--time-animation) linear infinite reverse; animation-delay: calc(var(--time-animation) / -2); }
+        .loader svg #clipping polygon:nth-child(6) { transform-origin: 60% 40%; animation: rotation var(--time-animation) linear infinite; }
+        .loader svg #clipping polygon:nth-child(7) { transform-origin: 60% 40%; animation: rotation var(--time-animation) linear infinite; animation-delay: calc(var(--time-animation) / -1.5); }
+
+        @keyframes rotation { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        @keyframes roundness { 0%, 60%, 100% { filter: contrast(15); } 20%, 40% { filter: contrast(3); } }
+        @keyframes colorize { 0%, 100% { filter: hue-rotate(0deg); } 20% { filter: hue-rotate(-30deg); } 40% { filter: hue-rotate(-60deg); } 60% { filter: hue-rotate(-90deg); } 80% { filter: hue-rotate(-45deg); } }
+
+        /* Route Card List Style */
+        .route-card { border: 2px solid #e2e8f0; border-radius: 1.5rem; padding: 0; cursor: pointer; transition: all 0.25s ease; background: #fff; overflow: hidden; display: flex; flex-direction: column; }
+        .route-card:hover { border-color: #0ea5e9; transform: translateY(-4px); box-shadow: 0 20px 40px -10px rgba(14,165,233,0.15); }
+        .route-card.selected { border-color: #0ea5e9; box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.15); }
+        .route-header { padding: 1.25rem 1.5rem; display: flex; justify-content: space-between; align-items: center; }
+        .route-card.selected .route-header { background-color: #f0f9ff; }
+        .route-body { padding: 1.25rem 1.5rem; background-color: #f8fafc; flex-grow: 1; border-top: 1px solid #f1f5f9;}
+        
+        /* Check List SVG */
+        .list-svg-icon { flex-shrink: 0; width: 22px; height: 22px; color: #0ea5e9; margin-top: 2px;}
+
+        /* Group Card */
+        .group-card { background: #ffffff; border: 2px solid #e2e8f0; border-radius: 1.25rem; padding: 1.25rem; cursor: pointer; transition: all 0.2s; display: flex; flex-direction: column; gap: 0.75rem; }
+        .group-card:not(.disabled):hover { border-color: #10b981; box-shadow: 0 10px 20px -5px rgba(16, 185, 129, 0.1); }
+        .group-card.selected { border-color: #10b981; background: #ecfdf5; box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.15); }
+        .group-card.disabled { opacity: 0.5; filter: grayscale(100%); cursor: not-allowed; border-color: #e2e8f0; background: #f1f5f9; }
+
+        /* Primary Button */
+        .btn-primary { background: linear-gradient(135deg, #1e3a8a 0%, #0369a1 100%); color: white; transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1); box-shadow: 0 10px 25px -5px rgba(30, 58, 138, 0.4); border-radius: 1.25rem;}
+        .btn-primary:hover:not(:disabled) { transform: translateY(-3px); box-shadow: 0 15px 35px -5px rgba(30, 58, 138, 0.5); background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%); }
+        .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; box-shadow: none; transform: none; }
+        
+        .swal2-html-container { margin-top: 1em !important; }
+
+        .step-dot { transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+        .step-dot.active { transform: scale(1.15); box-shadow: 0 0 20px rgba(14, 165, 233, 0.4); border: none; }
+        .step-dot.completed { background-color: #0ea5e9; color: white; border: none; transform: scale(1.05); }
+        .step-line-bg { background: #f1f5f9; height: 8px; border-radius: 10px; width: 100%; position: relative;}
+        .step-line-fill { background: linear-gradient(90deg, #1e3a8a, #0ea5e9, #10b981); height: 100%; border-radius: 10px; transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 0 15px rgba(14, 165, 233, 0.6); position: absolute; left: 0; top: 0;}
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen text-slate-800 flex flex-col relative overflow-x-hidden">
+
+    <div class="fixed top-[-10%] left-[-10%] w-[50%] h-[50%] bg-cra-400 rounded-full mix-blend-multiply filter blur-[120px] opacity-10 pointer-events-none z-[-1]"></div>
+    <div class="fixed bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-mint-400 rounded-full mix-blend-multiply filter blur-[120px] opacity-10 pointer-events-none z-[-1]"></div>
+    
+    <div class="floating-bg">
+        <i class="fi fi-sr-stethoscope float-icon" style="left: 10%; font-size: 4rem; animation-duration: 25s; animation-delay: 0s;"></i>
+        <i class="fi fi-sr-microscope float-icon" style="left: 80%; font-size: 5rem; animation-duration: 22s; animation-delay: 5s;"></i>
+        <i class="fi fi-sr-hospital float-icon" style="left: 30%; font-size: 3rem; animation-duration: 28s; animation-delay: 10s;"></i>
+        <i class="fi fi-sr-user-nurse float-icon" style="left: 65%; font-size: 4.5rem; animation-duration: 24s; animation-delay: 15s;"></i>
+        <i class="fi fi-sr-heart float-icon" style="left: 45%; font-size: 6rem; animation-duration: 30s; animation-delay: 2s;"></i>
+    </div>
+
+    <div id="loadingScreen" class="fixed inset-0 bg-slate-50/90 backdrop-blur-sm z-[100] flex flex-col items-center justify-center transition-opacity duration-500 p-6">
+        <div class="bg-white p-10 md:p-14 text-center max-w-lg w-full rounded-[2.5rem] shadow-2xl border border-slate-100 relative">
+            
+            <div class="loader">
+                <div class="box"></div>
+                <svg>
+                    <defs>
+                        <mask id="mask-clipping">
+                            <g id="clipping">
+                                <!-- Polygons for the Gooey Melting Effect -->
+                                <polygon points="50,10 90,80 10,80" fill="white" />
+                                <polygon points="50,20 80,70 20,70" fill="white" />
+                                <polygon points="50,15 85,75 15,75" fill="white" />
+                                <polygon points="50,5 95,85 5,85" fill="white" />
+                                <polygon points="50,25 75,65 25,65" fill="white" />
+                                <polygon points="50,30 70,60 30,60" fill="white" />
+                                <polygon points="50,0 100,90 0,90" fill="white" />
+                            </g>
+                        </mask>
+                    </defs>
+                </svg>
+            </div>
+
+            <h2 class="text-2xl md:text-3xl font-black text-cra-900 mb-2 tracking-tight mt-4">กำลังซิงค์ข้อมูล</h2>
+            <p class="text-slate-500 font-medium mb-2">อัปเดตโควตาที่นั่งแบบ Real-time...</p>
+        </div>
+    </div>
+
+    <div class="flex-grow flex flex-col items-center py-6 md:py-10 px-4 w-full opacity-0 hidden transition-opacity duration-700" id="mainContent">
+        <div class="w-full max-w-[850px] flex justify-between items-center mb-6">
+            <a href="index.html" class="flex items-center gap-2 text-slate-500 hover:text-cra-600 font-bold bg-white px-5 py-3 rounded-2xl shadow-sm border border-slate-100 transition-colors text-sm">
+                <i class="fi fi-sr-arrow-small-left text-xl mt-0.5"></i> กลับหน้าหลัก
+            </a>
+            <img src="https://i.postimg.cc/qzxLdhxJ/LOGO-CRAOH2027-01.png" alt="CRA Logo" class="h-10 object-contain">
+        </div>
+
+        <div class="w-full max-w-[850px] main-container">
+            <!-- Top Gradient Bar -->
+            <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-cra-900 via-cra-500 to-mint-400 rounded-t-[2.5rem]"></div>
+
+            <div class="p-6 md:p-12 pb-16">
+                <div id="formStepper" class="mb-14 relative w-full mx-auto mt-4 px-2 md:px-8">
+                    <!-- Progress Line -->
+                    <div class="absolute left-8 right-8 md:left-14 md:right-14 top-6 -translate-y-1/2 step-line-bg -z-10">
+                        <div class="step-line-fill" id="progressBar" style="width: 0%;"></div>
+                    </div>
+                    
+                    <div class="flex items-start justify-between relative z-10">
+                        <div class="flex flex-col items-center gap-3 w-16">
+                            <div id="dot1" class="w-12 h-12 rounded-full bg-gradient-to-br from-cra-600 to-cra-400 text-white flex justify-center items-center font-black text-xl step-dot active ring-4 ring-cra-50 shadow-lg">1</div>
+                            <span class="text-[10px] md:text-xs font-bold text-cra-700 text-center" id="text-dot1">ส่วนตัว</span>
+                        </div>
+                        <div class="flex flex-col items-center gap-3 w-16">
+                            <div id="dot2" class="w-12 h-12 rounded-full bg-white border-2 border-slate-200 text-slate-400 flex justify-center items-center font-black text-xl step-dot">2</div>
+                            <span class="text-[10px] md:text-xs font-bold text-slate-400 text-center" id="text-dot2">การศึกษา</span>
+                        </div>
+                        <div class="flex flex-col items-center gap-3 w-16">
+                            <div id="dot3" class="w-12 h-12 rounded-full bg-white border-2 border-slate-200 text-slate-400 flex justify-center items-center font-black text-xl step-dot">3</div>
+                            <span class="text-[10px] md:text-xs font-bold text-slate-400 text-center" id="text-dot3">เส้นทาง</span>
+                        </div>
+                        <div class="flex flex-col items-center gap-3 w-16">
+                            <div id="dot4" class="w-12 h-12 rounded-full bg-white border-2 border-slate-200 text-slate-400 flex justify-center items-center font-black text-xl step-dot">4</div>
+                            <span class="text-[10px] md:text-xs font-bold text-slate-400 text-center leading-tight" id="text-dot4">กลุ่ม &<br>ยืนยัน</span>
+                        </div>
+                    </div>
+                </div>
+
+                <form id="regForm">
+                    <input type="hidden" id="grade" value="">
+                    
+                    <div id="step1" class="step-section active visible ani-next space-y-6">
+                        <div class="flex items-center gap-4 mb-8 border-b-2 border-slate-50 pb-5">
+                            <div class="w-14 h-14 bg-cra-50 rounded-2xl flex items-center justify-center text-cra-600 border border-cra-100 shadow-sm"><i class="fi fi-sr-user text-2xl mt-1"></i></div>
+                            <div>
+                                <h2 class="text-2xl font-black text-cra-900 tracking-tight">1. ข้อมูลส่วนตัว</h2>
+                                <p class="text-slate-500 font-medium text-sm">โปรดระบุข้อมูลให้ถูกต้องครบถ้วน 1 เบอร์ ต่อ 1 สิทธิ์</p>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-12 gap-x-5 gap-y-2">
+                            <div class="col-span-12 md:col-span-4 input-wrapper">
+                                <label class="input-label">คำนำหน้า<span class="req">*</span></label>
+                                <div class="c-select-container" id="c-prefix">
+                                    <div class="c-select-trigger">
+                                        <div class="trigger-content"><i class="fi fi-sr-portrait trigger-icon"></i><span>เลือกคำนำหน้า</span></div>
+                                        <i class="fi fi-sr-angle-small-down text-slate-400"></i>
+                                    </div>
+                                    <div class="c-select-dropdown">
+                                        <div class="c-select-option" data-value="นาย"><i class="fi fi-sr-mars text-cra-400"></i><span>นาย</span></div>
+                                        <div class="c-select-option" data-value="นางสาว"><i class="fi fi-sr-venus text-pink-400"></i><span>นางสาว</span></div>
+                                        <div class="c-select-option" data-value="Mr."><i class="fi fi-sr-mars text-cra-400"></i><span>Mr.</span></div>
+                                        <div class="c-select-option" data-value="Ms."><i class="fi fi-sr-venus text-pink-400"></i><span>Ms.</span></div>
+                                    </div>
+                                </div>
+                                <input type="hidden" id="prefix" value="">
+                            </div>
+
+                            <div class="col-span-12 md:col-span-4 input-wrapper">
+                                <label class="input-label">ชื่อจริง (ภาษาไทย)<span class="req">*</span></label>
+                                <div class="input-container">
+                                    <i class="fi fi-sr-id-badge input-icon"></i>
+                                    <input type="text" id="fname" class="input-field" placeholder="เช่น ใจดี">
+                                </div>
+                            </div>
+
+                            <div class="col-span-12 md:col-span-4 input-wrapper">
+                                <label class="input-label">นามสกุล (ภาษาไทย)<span class="req">*</span></label>
+                                <div class="input-container">
+                                    <i class="fi fi-sr-users input-icon"></i>
+                                    <input type="text" id="lname" class="input-field" placeholder="เช่น เรียนเก่ง">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-5 gap-y-2">
+                            <div class="input-wrapper">
+                                <label class="input-label">เบอร์โทรศัพท์มือถือ<span class="req">*</span></label>
+                                <div class="input-container">
+                                    <i class="fi fi-sr-smartphone input-icon"></i>
+                                    <input type="tel" id="phone" class="input-field font-black tracking-widest text-lg" placeholder="0XX-XXX-XXXX" maxlength="12" oninput="formatPhone(this)">
+                                </div>
+                            </div>
+
+                            <div class="input-wrapper">
+                                <label class="input-label">อีเมล<span class="req">*</span></label>
+                                <div class="input-container relative">
+                                    <i class="fi fi-sr-envelope input-icon"></i>
+                                    <input type="email" id="email" class="input-field" placeholder="example@gmail.com" autocomplete="off" oninput="showEmailGuide(this)">
+                                    <ul id="emailDropdown" class="autocomplete-dropdown"></ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-end pt-6 border-t border-slate-100">
+                            <button type="button" onclick="nextStep(1)" class="btn-primary w-full md:w-auto px-12 py-4 font-black text-lg flex items-center justify-center gap-2">ถัดไป <i class="fi fi-sr-arrow-right mt-0.5"></i></button>
+                        </div>
+                    </div>
+
+                    <div id="step2" class="step-section space-y-6">
+                        <div class="flex items-center gap-4 mb-8 border-b-2 border-slate-50 pb-5">
+                            <div class="w-14 h-14 bg-orange-50 rounded-2xl flex items-center justify-center text-orange-500 border border-orange-100 shadow-sm"><i class="fi fi-sr-school text-2xl mt-1"></i></div>
+                            <div>
+                                <h2 class="text-2xl font-black text-cra-900 tracking-tight">2. ข้อมูลการศึกษา</h2>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-5 gap-y-2">
+                            <div class="input-wrapper">
+                                <label class="input-label">โรงเรียนที่กำลังศึกษา<span class="req">*</span></label>
+                                <div class="input-container relative">
+                                    <i class="fi fi-sr-search input-icon"></i>
+                                    <input type="text" id="schoolSearch" class="input-field" placeholder="พิมพ์ชื่อโรงเรียนเพื่อค้นหา..." autocomplete="off" oninput="fastSearchSchool(this.value)">
+                                    <ul id="schoolDropdown" class="autocomplete-dropdown"></ul>
+                                </div>
+                            </div>
+
+                            <div class="input-wrapper">
+                                <label class="input-label">จังหวัดที่ตั้งโรงเรียน<span class="req">*</span></label>
+                                <div class="c-select-container" id="c-province">
+                                    <div class="c-select-trigger">
+                                        <div class="trigger-content"><i class="fi fi-sr-map-marker trigger-icon"></i><span>เลือกจังหวัด</span></div>
+                                        <i class="fi fi-sr-angle-small-down text-slate-400"></i>
+                                    </div>
+                                    <div class="c-select-dropdown" id="provinceList"></div>
+                                </div>
+                                <input type="hidden" id="province" value="">
+                            </div>
+                        </div>
+
+                        <div class="input-wrapper">
+                            <label class="input-label">หลักสูตรที่สนใจศึกษาต่อมากที่สุด<span class="req">*</span></label>
+                            <div class="c-select-container" id="c-favcourse">
+                                <div class="c-select-trigger">
+                                    <div class="trigger-content"><i class="fi fi-sr-book-alt trigger-icon"></i><span>เลือกหลักสูตร</span></div>
+                                    <i class="fi fi-sr-angle-small-down text-slate-400"></i>
+                                </div>
+                                <div class="c-select-dropdown" id="favcourseList"></div>
+                            </div>
+                            <input type="hidden" id="favcourse" value="">
+                        </div>
+
+                        <div class="flex gap-4 pt-6 border-t border-slate-100">
+                            <button type="button" onclick="prevStep(2)" class="w-1/3 bg-slate-100 text-slate-600 hover:bg-slate-200 py-4 rounded-2xl font-bold transition-all">กลับ</button>
+                            <button type="button" onclick="nextStep(2)" class="w-2/3 btn-primary py-4 rounded-2xl font-black text-lg flex items-center justify-center gap-2">ถัดไป <i class="fi fi-sr-arrow-right mt-0.5"></i></button>
+                        </div>
+                    </div>
+
+                    <div id="step3" class="step-section space-y-6 pb-4">
+                        <div class="flex items-center gap-4 mb-8 border-b-2 border-slate-50 pb-5">
+                            <div class="w-14 h-14 bg-cra-50 rounded-2xl flex items-center justify-center text-cra-500 border border-cra-200 shadow-sm"><i class="fi fi-sr-map text-2xl mt-1"></i></div>
+                            <div>
+                                <h2 class="text-2xl font-black text-cra-900 tracking-tight">3. เลือกเส้นทาง</h2>
+                                <p class="text-slate-500 font-medium text-sm">เลือกได้ 1 เส้นทาง (เพื่อไปเลือกกลุ่มในหน้าถัดไป)</p>
+                            </div>
+                        </div>
+
+                        <input type="hidden" id="routeVal" value="">
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                            <!-- Route 1 Card -->
+                            <div class="route-card" id="card-route1" onclick="selectRoute(1)">
+                                <div class="route-header">
+                                    <div>
+                                        <h4 class="text-xl font-black text-cra-700 mb-1">Route 1</h4>
+                                        <p class="text-xs text-slate-500 font-bold">กลุ่ม 1 - 6 (สายเทคโนโลยี/ฉุกเฉิน)</p>
+                                    </div>
+                                    <div class="w-12 h-12 bg-cra-100 rounded-full flex justify-center items-center shadow-inner border border-cra-200"><i class="fi fi-sr-rocket-lunch text-cra-600 text-xl mt-1"></i></div>
+                                </div>
+                                <div class="route-body">
+                                    <p class="text-[13px] font-bold text-slate-500 mb-4">ฐานที่จะได้เข้าร่วมเรียนรู้:</p>
+                                    <ul class="space-y-3">
+                                        <li class="flex items-start gap-3">
+                                            <svg viewBox="0 0 24 24" fill="currentColor" class="list-svg-icon"><path fill-rule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zm13.36-1.814a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z" clip-rule="evenodd" /></svg>
+                                            <span class="text-sm font-semibold text-slate-700 leading-tight">ฐานที่ 1 ศูนย์ไซโคลตรอน และเพทสแกนแห่งชาติ</span>
+                                        </li>
+                                        <li class="flex items-start gap-3">
+                                            <svg viewBox="0 0 24 24" fill="currentColor" class="list-svg-icon"><path fill-rule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zm13.36-1.814a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z" clip-rule="evenodd" /></svg>
+                                            <span class="text-sm font-semibold text-slate-700 leading-tight">ฐานที่ 2 งานบริการรถพยาบาลฉุกเฉิน</span>
+                                        </li>
+                                        <li class="flex items-start gap-3">
+                                            <svg viewBox="0 0 24 24" fill="currentColor" class="list-svg-icon"><path fill-rule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zm13.36-1.814a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z" clip-rule="evenodd" /></svg>
+                                            <span class="text-sm font-semibold text-slate-700 leading-tight">ฐานที่ 3 งานเวชศาสตร์ฟื้นฟู</span>
+                                        </li>
+                                        <li class="flex items-start gap-3">
+                                            <svg viewBox="0 0 24 24" fill="currentColor" class="list-svg-icon"><path fill-rule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zm13.36-1.814a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z" clip-rule="evenodd" /></svg>
+                                            <span class="text-sm font-semibold text-slate-700 leading-tight">ฐานที่ 4 งานห้องปฏิบัติการกลาง</span>
+                                        </li>
+                                        <li class="flex items-start gap-3">
+                                            <svg viewBox="0 0 24 24" fill="currentColor" class="list-svg-icon"><path fill-rule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zm13.36-1.814a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z" clip-rule="evenodd" /></svg>
+                                            <span class="text-sm font-semibold text-slate-700 leading-tight">ฐานที่ 5 งานอายุรกรรมทางเดินอาหาร</span>
+                                        </li>
+                                        <li class="flex items-start gap-3">
+                                            <svg viewBox="0 0 24 24" fill="currentColor" class="list-svg-icon"><path fill-rule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zm13.36-1.814a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z" clip-rule="evenodd" /></svg>
+                                            <span class="text-sm font-semibold text-slate-700 leading-tight">ฐานที่ 6 งานกุมารเวชกรรม</span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <!-- Route 2 Card -->
+                            <div class="route-card" id="card-route2" onclick="selectRoute(2)">
+                                <div class="route-header">
+                                    <div>
+                                        <h4 class="text-xl font-black text-mint-600 mb-1">Route 2</h4>
+                                        <p class="text-xs text-slate-500 font-bold">กลุ่ม 7 - 12 (สายหัตถการ/คลินิก)</p>
+                                    </div>
+                                    <div class="w-12 h-12 bg-mint-50 rounded-full flex justify-center items-center shadow-inner border border-mint-200"><i class="fi fi-sr-microscope text-mint-500 text-xl mt-1"></i></div>
+                                </div>
+                                <div class="route-body">
+                                    <p class="text-[13px] font-bold text-slate-500 mb-4">ฐานที่จะได้เข้าร่วมเรียนรู้:</p>
+                                    <ul class="space-y-3">
+                                        <li class="flex items-start gap-3">
+                                            <svg viewBox="0 0 24 24" fill="currentColor" class="list-svg-icon !text-mint-500"><path fill-rule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zm13.36-1.814a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z" clip-rule="evenodd" /></svg>
+                                            <span class="text-sm font-semibold text-slate-700 leading-tight">ฐานที่ 7 ฝ่ายเภสัชกรรม</span>
+                                        </li>
+                                        <li class="flex items-start gap-3">
+                                            <svg viewBox="0 0 24 24" fill="currentColor" class="list-svg-icon !text-mint-500"><path fill-rule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zm13.36-1.814a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z" clip-rule="evenodd" /></svg>
+                                            <span class="text-sm font-semibold text-slate-700 leading-tight">ฐานที่ 8 งานจักษุวิทยา และงานโสต ศอ นาสิก</span>
+                                        </li>
+                                        <li class="flex items-start gap-3">
+                                            <svg viewBox="0 0 24 24" fill="currentColor" class="list-svg-icon !text-mint-500"><path fill-rule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zm13.36-1.814a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z" clip-rule="evenodd" /></svg>
+                                            <span class="text-sm font-semibold text-slate-700 leading-tight">ฐานที่ 9 งานโภชนาการ</span>
+                                        </li>
+                                        <li class="flex items-start gap-3">
+                                            <svg viewBox="0 0 24 24" fill="currentColor" class="list-svg-icon !text-mint-500"><path fill-rule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zm13.36-1.814a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z" clip-rule="evenodd" /></svg>
+                                            <span class="text-sm font-semibold text-slate-700 leading-tight">ฐานที่ 10 ห้องผ่าตัดและงานวิสัญญีวิทยา</span>
+                                        </li>
+                                        <li class="flex items-start gap-3">
+                                            <svg viewBox="0 0 24 24" fill="currentColor" class="list-svg-icon !text-mint-500"><path fill-rule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zm13.36-1.814a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z" clip-rule="evenodd" /></svg>
+                                            <span class="text-sm font-semibold text-slate-700 leading-tight">ฐานที่ 11 ศูนย์หัวใจและหลอดเลือด</span>
+                                        </li>
+                                        <li class="flex items-start gap-3">
+                                            <svg viewBox="0 0 24 24" fill="currentColor" class="list-svg-icon !text-mint-500"><path fill-rule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zm13.36-1.814a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z" clip-rule="evenodd" /></svg>
+                                            <span class="text-sm font-semibold text-slate-700 leading-tight">ฐานที่ 12 งานรังสีวินิจฉัยและร่วมรักษา</span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex gap-4 pt-6 border-t border-slate-100">
+                            <button type="button" onclick="prevStep(3)" class="w-1/3 bg-slate-100 text-slate-600 hover:bg-slate-200 py-4 rounded-2xl font-bold transition-all">กลับ</button>
+                            <button type="button" onclick="nextStep(3)" class="w-2/3 btn-primary py-4 rounded-2xl font-black text-lg flex items-center justify-center gap-2">ถัดไปเลือกกลุ่ม <i class="fi fi-sr-arrow-right mt-0.5"></i></button>
+                        </div>
+                    </div>
+
+                    <div id="step4" class="step-section space-y-8 pb-4">
+                        <div class="flex items-center gap-4 border-b-2 border-slate-50 pb-5">
+                            <div class="w-14 h-14 bg-mint-50 rounded-2xl flex items-center justify-center text-mint-500 border border-mint-200 shadow-sm"><i class="fi fi-sr-users-alt text-2xl mt-1"></i></div>
+                            <div>
+                                <h2 class="text-2xl font-black text-cra-900 tracking-tight">4. เลือกกลุ่ม & แบบสำรวจ</h2>
+                                <p class="text-slate-500 font-medium text-sm">เลือกกลุ่มเข้าฐาน 1 กลุ่มเท่านั้น (รับ 18 คน/กลุ่ม)</p>
+                            </div>
+                        </div>
+
+                        <input type="hidden" id="groupVal" value="">
+
+                        <!-- Groups Grid (Injected by JS) -->
+                        <div class="bg-slate-50 p-5 md:p-6 rounded-3xl border border-slate-100 mb-8 shadow-inner">
+                            <h4 class="font-bold text-slate-700 mb-4 flex items-center gap-2" id="groupTitle"><i class="fi fi-sr-map-pin text-cra-500"></i> กลุ่มเข้าฐาน</h4>
+                            <div class="grid grid-cols-2 md:grid-cols-3 gap-4" id="groupsGrid"></div>
+                        </div>
+
+                        <div class="h-px w-full bg-slate-200 my-8"></div>
+
+                        <!-- Survey -->
+                        <h3 class="font-bold text-cra-900 mb-6 text-xl flex items-center"><i class="fi fi-sr-poll-h text-orange-500 mr-3 text-2xl"></i> แบบสำรวจเพิ่มเติม</h3>
+                        
+                        <div class="input-wrapper mb-6">
+                            <label class="input-label">ทราบข่าวจากแหล่งใด<span class="req">*</span></label>
+                            <div class="c-select-container" id="c-source">
+                                <div class="c-select-trigger">
+                                    <div class="trigger-content"><i class="fi fi-sr-bullhorn trigger-icon"></i><span>เลือกแหล่งข่าว</span></div>
+                                    <i class="fi fi-sr-angle-small-down text-slate-400"></i>
+                                </div>
+                                <div class="c-select-dropdown" id="sourceList"></div>
+                            </div>
+                            <input type="hidden" id="source" value="">
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-5 gap-y-2">
+                            <div class="input-wrapper">
+                                <label class="input-label">ติดตามเพจ Education CRA หรือไม่<span class="req">*</span></label>
+                                <div class="c-select-container" id="c-followPage">
+                                    <div class="c-select-trigger">
+                                        <div class="trigger-content"><i class="fi fi-sr-thumbs-up trigger-icon"></i><span>เลือกสถานะ</span></div>
+                                        <i class="fi fi-sr-angle-small-down text-slate-400"></i>
+                                    </div>
+                                    <div class="c-select-dropdown">
+                                        <div class="c-select-option" data-value="ติดตาม"><span>ใช่, ติดตาม</span></div>
+                                        <div class="c-select-option" data-value="ไม่ได้ติดตาม"><span>ไม่ได้ติดตาม</span></div>
+                                    </div>
+                                </div>
+                                <input type="hidden" id="followPage" value="">
+                            </div>
+
+                            <div class="input-wrapper hidden transition-all" id="wrapPlatform">
+                                <label class="input-label text-orange-600">ติดตามทางแพลตฟอร์มใดเป็นหลัก<span class="req">*</span></label>
+                                <div class="c-select-container" id="c-followPlatform">
+                                    <div class="c-select-trigger border-orange-200 bg-orange-50 focus:border-orange-500">
+                                        <div class="trigger-content"><i class="fi fi-sr-apps trigger-icon text-orange-500"></i><span class="text-orange-900">เลือกแพลตฟอร์ม</span></div>
+                                        <i class="fi fi-sr-angle-small-down text-orange-400"></i>
+                                    </div>
+                                    <div class="c-select-dropdown" id="platformList"></div>
+                                </div>
+                                <input type="hidden" id="followPlatform" value="">
+                            </div>
+                        </div>
+
+                        <div class="flex gap-4 pt-8 border-t border-slate-100 mt-8">
+                            <button type="button" onclick="prevStep(4)" class="w-1/3 bg-slate-100 text-slate-600 hover:bg-slate-200 py-4 rounded-2xl font-bold transition-all">กลับ</button>
+                            <button type="button" id="btnSubmit" onclick="submitForm()" class="w-2/3 btn-primary py-4 rounded-2xl font-black text-lg flex items-center justify-center gap-2 shadow-lg hover:shadow-xl">
+                                ยืนยันลงทะเบียน <i class="fi fi-sr-check-circle mt-0.5"></i>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+
+                <div id="successView" class="hidden flex-col items-center animate-[fadeIn_0.5s_ease-out] py-4">
+                    <div class="w-20 h-20 bg-green-100 text-green-500 rounded-full flex items-center justify-center mb-4 shadow-inner border-4 border-white">
+                        <i class="fi fi-sr-badge-check text-4xl mt-1"></i>
+                    </div>
+                    <h2 class="text-3xl font-black text-cra-900 mb-2 text-center tracking-tight">บัตร E-PASS ของท่าน</h2>
+                    <p class="text-slate-500 mb-8 text-center font-medium">โปรดบันทึกภาพนี้ไว้สำหรับสแกนเข้างานและเข้าฐานกิจกรรม</p>
+
+                    <!-- Ticket Capture Area -->
+                    <div id="ticket-capture" class="bg-gradient-to-br from-cra-900 to-slate-800 rounded-[2.5rem] p-8 pb-10 text-white shadow-2xl relative overflow-hidden w-full max-w-[380px] text-center mb-8 border border-slate-700">
+                        <div class="absolute top-0 right-0 w-32 h-32 bg-cra-500 rounded-full mix-blend-screen filter blur-[40px] opacity-40"></div>
+                        
+                        <p class="text-[11px] text-slate-300 font-black mb-0.5 tracking-widest uppercase">CRA OPENHOUSE 2027</p>
+                        <p class="text-[9px] text-slate-400 font-bold mb-4 leading-relaxed px-2">กิจกรรมฐานการเรียนรู้ทางการแพทย์ โรงพยาบาลจุฬาภรณ์</p>
+                        
+                        <div class="text-2xl font-black mb-1 drop-shadow-md text-white truncate px-2" id="epass-name">--</div>
+                        <div class="text-sm font-bold text-cra-300 mb-6 truncate px-2" id="epass-grade">--</div>
+
+                        <div class="flex justify-center gap-3 mb-6">
+                            <div class="bg-white/10 backdrop-blur px-4 py-2 rounded-xl border border-white/20 w-1/2">
+                                <p class="text-[10px] text-slate-400 font-bold uppercase mb-0.5">ROUTE</p>
+                                <p class="text-lg font-black text-cra-400" id="epass-route">--</p>
+                            </div>
+                            <div class="bg-white/10 backdrop-blur px-4 py-2 rounded-xl border border-white/20 w-1/2">
+                                <p class="text-[10px] text-slate-400 font-bold uppercase mb-0.5">GROUP</p>
+                                <p class="text-lg font-black text-mint-400" id="epass-group">--</p>
+                            </div>
+                        </div>
+
+                        <div class="bg-white p-3.5 rounded-2xl inline-block shadow-inner mx-auto relative mb-4">
+                            <img id="epass-qr" src="" class="w-40 h-40 object-contain rounded-xl" crossorigin="anonymous">
+                        </div>
+                        <div class="text-lg font-black tracking-widest text-slate-300" id="epass-id">--</div>
+                    </div>
+
+                    <!-- 4 Action Buttons -->
+                    <div class="grid grid-cols-2 gap-3 w-full max-w-[380px]">
+                        <button type="button" onclick="downloadTicket()" class="bg-cra-600 hover:bg-cra-700 text-white py-3.5 rounded-xl font-bold transition-all shadow-md flex justify-center items-center gap-2 text-sm">
+                            <i class="fi fi-sr-download"></i> ดาวน์โหลด
+                        </button>
+                        <button type="button" onclick="sendTicketEmail()" class="bg-slate-50 hover:bg-slate-100 text-slate-700 py-3.5 rounded-xl font-bold transition-all shadow-sm flex justify-center items-center gap-2 text-sm border-2 border-slate-200">
+                            <i class="fi fi-sr-envelope"></i> ส่งเข้าอีเมล
+                        </button>
+                        <button type="button" onclick="addToCalendar()" class="bg-slate-50 hover:bg-slate-100 text-slate-700 py-3.5 rounded-xl font-bold transition-all shadow-sm flex justify-center items-center gap-2 text-sm border-2 border-slate-200">
+                            <i class="fi fi-sr-calendar-plus"></i> ลง Calendar
+                        </button>
+                        <button type="button" onclick="reportIssue()" class="bg-rose-50 hover:bg-rose-100 text-rose-600 py-3.5 rounded-xl font-bold transition-all shadow-sm flex justify-center items-center gap-2 text-sm border-2 border-rose-200">
+                            <i class="fi fi-sr-headset"></i> แจ้งปัญหา
+                        </button>
+                    </div>
+
+                    <a href="index.html" class="mt-8 text-sm font-bold text-slate-400 hover:text-cra-600 transition-colors underline underline-offset-4">กลับหน้าหลัก</a>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx792pTv4hvqt2tsQA3_Dv4sodtm1U67XOtTTvW5YpgoFIIuTxbNQFdQHGFlcd8HUBiIw/exec"; 
+        const MAX_SEAT_PER_GROUP = 18;
+
+        let rawSchoolData = [];
+        let quotaData = {};
+        let currentEpassData = null; // เก็บข้อมูลหลังสมัครผ่าน สำหรับใช้ในปุ่มต่างๆ
+
+        const provincesList = ["กรุงเทพมหานคร","กระบี่","กาญจนบุรี","กาฬสินธุ์","กำแพงเพชร","ขอนแก่น","จันทบุรี","ฉะเชิงเทรา","ชลบุรี","ชัยนาท","ชัยภูมิ","ชุมพร","เชียงราย","เชียงใหม่","ตรัง","ตราด","ตาก","นครนายก","นครปฐม","นครพนม","นครราชสีมา","นครศรีธรรมราช","นครสวรรค์","นนทบุรี","นราธิวาส","น่าน","บึงกาฬ","บุรีรัมย์","ปทุมธานี","ประจวบคีรีขันธ์","ปราจีนบุรี","ปัตตานี","พระนครศรีอยุธยา","พะเยา","พังงา","พัทลุง","พิจิตร","พิษณุโลก","เพชรบุรี","เพชรบูรณ์","แพร่","ภูเก็ต","มหาสารคาม","มุกดาหาร","แม่ฮ่องสอน","ยโสธร","ยะลา","ร้อยเอ็ด","ระนอง","ระยอง","ราชบุรี","ลพบุรี","ลำปาง","ลำพูน","เลย","ศรีสะเกษ","สกลนคร","สงขลา","สตูล","สมุทรปราการ","สมุทรสงคราม","สมุทรสาคร","สระแก้ว","สระบุรี","สิงห์บุรี","สุโขทัย","สุพรรณบุรี","สุราษฎร์ธานี","สุรินทร์","หนองคาย","หนองบัวลำภู","อ่างทอง","อำนาจเจริญ","อุดรธานี","อุตรดิตถ์","อุทัยธานี","อุบลราชธานี"];
+        const courseList = ['แพทยศาสตร์', 'พยาบาลศาสตร์', 'รังสีเทคนิค', 'วิทยาศาสตร์ข้อมูลสุขภาพ', 'วิทยาศาสตร์การเคลื่อนไหวและสุขภาพ', 'ฉุกเฉินการแพทย์', 'นวัตกรรมวิทยาศาสตร์การแพทย์', 'วิศวกรรมชีวการแพทย์', 'เทคโนโลยีอาหารทางการแพทย์และสุขภาพ'];
+        const sourceList = ["CRA Roadshow (ที่โรงเรียนของท่าน)", "Dek-D's TCAS Fair", "สื่อสังคมออนไลน์ราชวิทยาลัยจุฬาภรณ์ และ Education CRA", "เว็บไซต์ราชวิทยาลัยจุฬาภรณ์", "เพื่อน / คนรู้จัก / ครูแนะนำ", "แบนเนอร์ประชาสัมพันธ์"];
+        const platformList = ['Facebook', 'Instagram', 'TikTok', 'X (Twitter)'];
+        const emailDomains = ['@gmail.com', '@hotmail.com', '@outlook.co.th', '@yahoo.com'];
+
+        window.onload = () => {
+            // Populate Dropdowns statically first
+            const provUI = document.getElementById('provinceList');
+            provincesList.forEach(p => provUI.innerHTML += `<div class="c-select-option" data-value="${p}"><span>${p}</span></div>`);
+            const courseUI = document.getElementById('favcourseList');
+            courseList.forEach(c => courseUI.innerHTML += `<div class="c-select-option" data-value="${c}"><span>${c}</span></div>`);
+            const srcUI = document.getElementById('sourceList');
+            sourceList.forEach(s => srcUI.innerHTML += `<div class="c-select-option" data-value="${s}"><span>${s}</span></div>`);
+            const platUI = document.getElementById('platformList');
+            platformList.forEach(p => platUI.innerHTML += `<div class="c-select-option" data-value="${p}"><span>${p}</span></div>`);
+
+            setupCustomSelects();
+
+            // Load Data
+            Promise.all([
+                fetch(SCRIPT_URL + "?action=getSchools").then(r => r.json()).catch(() => []),
+                fetch(SCRIPT_URL + "?action=getQuotas&type=normal").then(r => r.json()).catch(() => ({}))
+            ]).then(([schools, quotas]) => {
+                rawSchoolData = schools;
+                quotaData = quotas;
+                
+                document.getElementById('loadingScreen').classList.add('opacity-0');
+                setTimeout(() => { 
+                    document.getElementById('loadingScreen').classList.add('hidden');
+                    runPDPAFlow(); 
+                }, 500);
+            });
+        };
+
+        function runPDPAFlow() {
+            Swal.fire({
+                html: `
+                    <div class="text-center pt-2 pb-4">
+                        <div class="w-20 h-20 bg-cra-50 rounded-full flex items-center justify-center mx-auto mb-4 border-2 border-cra-100">
+                            <i class="fi fi-sr-shield-check text-4xl text-cra-500 mt-1"></i>
+                        </div>
+                        <h2 class="text-2xl font-black text-cra-900 mb-4">นโยบายคุ้มครองข้อมูลส่วนบุคคล<br><span class="text-xl text-slate-500">(PDPA)</span></h2>
+                        <div class="text-sm text-left text-slate-600 h-44 overflow-y-auto bg-slate-50 p-5 rounded-2xl border border-slate-200 leading-relaxed shadow-inner">
+                            <p class="mb-3">เพื่อเป็นการปฏิบัติตามพระราชบัญญัติคุ้มครองข้อมูลส่วนบุคคล พ.ศ. 2562 (PDPA) ราชวิทยาลัยจุฬาภรณ์ ขอความยินยอมในการเก็บรวบรวม ใช้ และประมวลผลข้อมูลส่วนบุคคลของท่าน (ได้แก่ ชื่อ-นามสกุล เบอร์โทรศัพท์ อีเมล ข้อมูลการศึกษา)</p>
+                            <p class="mb-3"><b>วัตถุประสงค์:</b> เพื่อใช้ในการลงทะเบียนเข้าร่วมกิจกรรม CRA OPENHOUSE 2027, การยืนยันตัวตน, การติดต่อประสานงาน, และการจัดทำสถิติภายในโครงการเท่านั้น</p>
+                            <p><b>การรักษาความปลอดภัย:</b> ข้อมูลของท่านจะถูกเก็บรักษาไว้เป็นความลับด้วยมาตรฐานความปลอดภัยสูงสุด และจะไม่ถูกเปิดเผยแก่บุคคลที่สามโดยไม่ได้รับความยินยอม เว้นแต่เป็นไปตามที่กฎหมายกำหนด</p>
+                        </div>
+                    </div>
+                `,
+                showCancelButton: true,
+                confirmButtonText: 'ยินยอมและไปต่อ',
+                cancelButtonText: 'ไม่ยินยอม',
+                allowOutsideClick: false,
+                customClass: { 
+                    popup: 'rounded-[2rem] p-6', 
+                    confirmButton: 'bg-cra-500 hover:bg-cra-600 text-white rounded-xl px-8 py-3.5 font-bold border-none shadow-md w-full sm:w-auto mb-2 sm:mb-0', 
+                    cancelButton: 'bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-xl px-8 py-3.5 font-bold border-none shadow-sm w-full sm:w-auto',
+                    actions: 'flex-col sm:flex-row w-full gap-2'
+                },
+                buttonsStyling: false
+            }).then((result) => {
+                if(result.isConfirmed) {
+                    askGrade();
+                } else window.location.href = 'index.html';
+            });
+        }
+
+        function askGrade() {
+            Swal.fire({
+                html: `
+                    <div class="flex justify-center mb-4 mt-2">
+                        <div class="w-20 h-20 bg-sky-50 rounded-full flex items-center justify-center shadow-md border-4 border-white">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-10 h-10 text-sky-500">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z" />
+                            </svg>
+                        </div>
+                    </div>
+                    <h2 class="text-2xl font-black text-slate-800 mb-6 tracking-tight">คุณเป็นนักเรียนระดับชั้นใด?</h2>
+                    
+                    <div class="bg-rose-50 border border-rose-200 text-rose-600 px-4 py-3.5 rounded-2xl flex items-start gap-3 mb-6 shadow-sm max-w-sm mx-auto text-left">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 shrink-0 mt-0.5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                        </svg>
+                        <span class="font-bold text-sm leading-relaxed">กิจกรรมนี้สงวนสิทธิ์เฉพาะนักเรียนระดับมัธยมศึกษาตอนปลายเท่านั้น</span>
+                    </div>
+
+                    <div class="flex flex-col gap-3">
+                        <button onclick="Swal.close(); setTimeout(() => setGrade('มัธยมศึกษาปีที่ 4'), 150)" class="w-full py-4 rounded-xl border-2 border-sky-400 hover:bg-sky-50 text-sky-700 font-bold transition-all text-lg shadow-sm">มัธยมศึกษาปีที่ 4</button>
+                        <button onclick="Swal.close(); setTimeout(() => setGrade('มัธยมศึกษาปีที่ 5'), 150)" class="w-full py-4 rounded-xl border-2 border-sky-400 hover:bg-sky-50 text-sky-700 font-bold transition-all text-lg shadow-sm">มัธยมศึกษาปีที่ 5</button>
+                        <button onclick="Swal.close(); setTimeout(() => setGrade('มัธยมศึกษาปีที่ 6'), 150)" class="w-full py-4 rounded-xl border-2 border-sky-400 hover:bg-sky-50 text-sky-700 font-bold transition-all text-lg shadow-sm">มัธยมศึกษาปีที่ 6</button>
+                    </div>
+                `,
+                showConfirmButton: false,
+                showCancelButton: true,
+                cancelButtonText: 'ไม่ใช่นักเรียนระดับชั้น ม.ปลาย',
+                allowOutsideClick: false,
+                customClass: { 
+                    popup: 'rounded-[2.5rem] p-6 md:p-8', 
+                    cancelButton: 'rounded-xl px-6 py-4 font-bold bg-slate-500 text-white mt-6 transition-colors hover:bg-slate-600 w-full shadow-sm text-base' 
+                }
+            }).then((res) => {
+                if(res.dismiss === Swal.DismissReason.cancel) {
+                    window.location.href = 'index.html';
+                }
+            });
+        }
+
+        function setGrade(val) {
+            document.getElementById('grade').value = val;
+            Swal.fire({
+                title: 'คำแนะนำก่อนกรอก!', 
+                html: '<span class="text-slate-600 text-sm font-medium">โปรดกรอกเบอร์และอีเมลให้ถูกต้อง สมัครได้ 1 ชื่อ/1 เบอร์ ไม่สามารถลงซ้ำได้ หากพิมพ์ผิดสามารถกดแจ้งปัญหาที่หน้าแรกและหน้า E-PASS ได้เลยครับ</span>', 
+                icon: 'info', 
+                confirmButtonText: 'รับทราบ',
+                confirmButtonColor: '#0ea5e9',
+                customClass: { 
+                    popup: 'rounded-[2rem]', 
+                    confirmButton: 'rounded-xl px-8 py-3.5 font-bold shadow-md w-full' 
+                }
+            }).then(() => {
+                document.getElementById('mainContent').classList.remove('hidden', 'opacity-0');
+            });
+        }
+
+        function setupCustomSelects() {
+            document.querySelectorAll('.c-select-container').forEach(container => {
+                const trigger = container.querySelector('.c-select-trigger');
+                const options = container.querySelectorAll('.c-select-option');
+                const hiddenInput = document.getElementById(container.id.replace('c-', ''));
+                const triggerSpan = trigger.querySelector('.trigger-content span');
+
+                trigger.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    document.querySelectorAll('.c-select-container').forEach(c => { if(c !== container) c.classList.remove('open'); });
+                    container.classList.toggle('open');
+                });
+
+                options.forEach(opt => {
+                    opt.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const val = opt.getAttribute('data-value');
+                        hiddenInput.value = val;
+                        triggerSpan.innerText = val; 
+                        trigger.classList.add('has-value');
+
+                        options.forEach(o => o.classList.remove('selected'));
+                        opt.classList.add('selected');
+                        container.classList.remove('open');
+
+                        if(hiddenInput.id === 'followPage') {
+                            const wrapPlatform = document.getElementById('wrapPlatform');
+                            if(val === 'ติดตาม') wrapPlatform.classList.remove('hidden');
+                            else { 
+                                wrapPlatform.classList.add('hidden'); 
+                                document.getElementById('followPlatform').value = ""; 
+                                document.querySelector('#c-followPlatform .trigger-content span').innerText = "เลือกแพลตฟอร์ม"; 
+                                document.querySelector('#c-followPlatform .c-select-trigger').classList.remove('has-value');
+                            }
+                        }
+                    });
+                });
+            });
+
+            document.addEventListener('click', (e) => {
+                if(!e.target.closest('.c-select-container')) document.querySelectorAll('.c-select-container').forEach(c => c.classList.remove('open'));
+                if(e.target.id !== 'schoolSearch') document.getElementById('schoolDropdown').style.display = 'none';
+                if(e.target.id !== 'email') document.getElementById('emailDropdown').style.display = 'none';
+            });
+        }
+
+        function setCustomSelectValue(id, val) {
+            const container = document.getElementById('c-' + id);
+            if(!container) return;
+            const hiddenInput = document.getElementById(id);
+            const triggerSpan = container.querySelector('.trigger-content span');
+            const trigger = container.querySelector('.c-select-trigger');
+            const options = container.querySelectorAll('.c-select-option');
+
+            hiddenInput.value = val;
+            triggerSpan.innerText = val;
+            trigger.classList.add('has-value');
+
+            options.forEach(opt => {
+                if(opt.getAttribute('data-value') === val) { opt.classList.add('selected'); }
+                else { opt.classList.remove('selected'); }
+            });
+        }
+
+        function showEmailGuide(el) {
+            const val = el.value.trim();
+            const drop = document.getElementById('emailDropdown');
+            if(val.includes('@') || val.length < 1) { drop.style.display = 'none'; return; }
+            drop.innerHTML = emailDomains.map(d => `<li onclick="applyEmail('${val}${d}')"><span class="font-medium text-slate-800">${val}<b class="text-cra-500">${d}</b></span></li>`).join('');
+            drop.style.display = 'block';
+        }
+        function applyEmail(fullEmail) {
+            document.getElementById('email').value = fullEmail;
+            document.getElementById('emailDropdown').style.display = 'none';
+        }
+
+        function formatPhone(el) {
+            let v = el.value.replace(/\D/g,'');
+            if(v.length > 10) v = v.substring(0,10);
+            if(v.length > 6) el.value = v.substring(0,3)+'-'+v.substring(3,6)+'-'+v.substring(6);
+            else if(v.length > 3) el.value = v.substring(0,3)+'-'+v.substring(3);
+            else el.value = v;
+        }
+
+        function fastSearchSchool(val) {
+            const box = document.getElementById('schoolDropdown'); box.innerHTML = '';
+            if (val.trim().length < 2) { box.style.display = 'none'; return; }
+            const results = rawSchoolData.filter(r => r[0].toLowerCase().includes(val.toLowerCase())).slice(0, 10);
+            if (results.length > 0) {
+                results.forEach(r => {
+                    const li = document.createElement('li');
+                    li.innerHTML = `<span class="font-bold text-slate-700 truncate mr-2"><i class="fi fi-sr-school text-slate-400 mr-2 text-xs"></i>${r[0]}</span> <span class="text-[10px] text-slate-500 bg-slate-100 px-2 py-0.5 rounded shrink-0">จ.${r[1]}</span>`;
+                    li.onclick = () => {
+                        document.getElementById('schoolSearch').value = r[0];
+                        setCustomSelectValue('province', r[1]);
+                        box.style.display = 'none';
+                    };
+                    box.appendChild(li);
+                });
+            } else box.innerHTML = '<li class="text-slate-400 italic justify-center">พิมพ์ชื่อโรงเรียนเต็มได้เลยครับ</li>';
+            box.style.display = 'block';
+        }
+
+        function selectRoute(r) {
+            document.getElementById('card-route1').classList.remove('selected');
+            document.getElementById('card-route2').classList.remove('selected');
+            document.getElementById('card-route' + r).classList.add('selected');
+            document.getElementById('routeVal').value = r;
+        }
+
+        function generateGroups(route) {
+            const gGrid = document.getElementById('groupsGrid');
+            const gTitle = document.getElementById('groupTitle');
+            document.getElementById('groupVal').value = ''; 
+
+            gTitle.innerHTML = `<i class="fi fi-sr-map-pin text-${route === 1 ? 'cra-500' : 'mint-500'}"></i> เลือกกลุ่ม (Route ${route})`;
+
+            const startG = route === 1 ? 1 : 7;
+            const endG = route === 1 ? 6 : 12;
+            const colorClass = route === 1 ? 'cra' : 'mint';
+
+            gGrid.innerHTML = '';
+            for(let i = startG; i <= endG; i++) {
+                const groupName = 'G' + i;
+                let used = quotaData[groupName] || 0;
+                let remain = MAX_SEAT_PER_GROUP - used;
+                if(remain < 0) remain = 0;
+                const isFull = remain === 0;
+                const percent = (used / MAX_SEAT_PER_GROUP) * 100;
+
+                gGrid.innerHTML += `
+                    <div class="group-card ${isFull ? 'disabled' : ''}" id="gcard-${i}" onclick="${isFull ? '' : `selectGroup(${i})`}">
+                        <div class="flex justify-between items-center">
+                            <span class="font-black text-slate-700 text-lg">กลุ่ม ${i}</span>
+                            <span class="text-xs font-bold px-2.5 py-1 rounded-md ${isFull ? 'bg-slate-200 text-slate-500' : `bg-${colorClass}-50 text-${colorClass}-600`}">${isFull ? 'เต็มแล้ว' : `ว่าง ${remain}`}</span>
+                        </div>
+                        <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden mt-1 shadow-inner">
+                            <div class="${isFull ? 'bg-slate-300' : `bg-${colorClass}-400`} h-full transition-all duration-1000" style="width: ${percent}%"></div>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        function selectGroup(gId) {
+            document.getElementById('groupVal').value = 'G' + gId;
+            const route = parseInt(document.getElementById('routeVal').value);
+            const startG = route === 1 ? 1 : 7;
+            const endG = route === 1 ? 6 : 12;
+            
+            for(let i = startG; i <= endG; i++) {
+                const el = document.getElementById('gcard-'+i);
+                if(el && !el.classList.contains('disabled')) { el.classList.remove('selected'); }
+            }
+            document.getElementById('gcard-'+gId).classList.add('selected');
+        }
+
+        function updateProgress(step) {
+            const bar = document.getElementById('progressBar');
+            if(step === 1) bar.style.width = '0%';
+            else if(step === 2) bar.style.width = '33.33%';
+            else if(step === 3) bar.style.width = '66.66%';
+            else if(step === 4) bar.style.width = '100%';
+
+            for(let i = 1; i <= 4; i++) {
+                const dot = document.getElementById('dot' + i);
+                const txt = document.getElementById('text-dot' + i);
+                
+                // Reset to default
+                dot.className = "w-12 h-12 rounded-full bg-white border-2 border-slate-200 text-slate-400 flex justify-center items-center font-black text-xl step-dot transition-all";
+                txt.className = "text-[10px] md:text-xs font-bold text-slate-400 text-center" + (i === 4 ? " leading-tight" : "");
+                
+                if (i < step) {
+                    // Completed step
+                    dot.className = "w-12 h-12 rounded-full bg-cra-500 text-white flex justify-center items-center font-black text-xl step-dot completed shadow-md transition-all";
+                    dot.innerHTML = '<i class="fi fi-sr-check"></i>';
+                    txt.classList.replace('text-slate-400', 'text-cra-600');
+                } else if (i === step) {
+                    // Active step
+                    dot.className = "w-12 h-12 rounded-full bg-gradient-to-br from-cra-600 to-cra-400 text-white flex justify-center items-center font-black text-xl step-dot active ring-4 ring-cra-50 shadow-lg transition-all";
+                    dot.innerHTML = i;
+                    txt.classList.replace('text-slate-400', 'text-cra-700');
+                } else {
+                    // Pending step
+                    dot.innerHTML = i;
+                }
+            }
+        }
+
+        function animateStepChange(targetStepNum, animationClass) {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            updateProgress(targetStepNum);
+            document.querySelectorAll('.step-section').forEach(sec => { sec.classList.remove('visible', 'ani-next', 'ani-prev'); });
+            document.getElementById('step' + targetStepNum).classList.add('visible', animationClass);
+        }
+
+        function nextStep(s) {
+            if (s === 1) {
+                if(!document.getElementById('prefix').value || !document.getElementById('fname').value || !document.getElementById('lname').value || !document.getElementById('email').value || !document.getElementById('phone').value) {
+                    return Swal.fire({icon: 'warning', text: 'กรุณากรอกข้อมูลส่วนตัวให้ครบถ้วน'});
+                }
+                if(document.getElementById('phone').value.length !== 12) return Swal.fire({icon: 'warning', text: 'เบอร์โทรศัพท์ไม่ถูกต้อง (ต้อง 10 หลัก)'});
+                animateStepChange(2, 'ani-next');
+            } else if (s === 2) {
+                if(!document.getElementById('schoolSearch').value || !document.getElementById('province').value || !document.getElementById('favcourse').value) {
+                    return Swal.fire({icon: 'warning', text: 'กรุณากรอกข้อมูลการศึกษาให้ครบถ้วน'});
+                }
+                animateStepChange(3, 'ani-next');
+            } else if (s === 3) {
+                const route = document.getElementById('routeVal').value;
+                if(!route) return Swal.fire({icon: 'warning', text: 'กรุณาเลือก Route 1 หรือ Route 2 ก่อนครับ'});
+                
+                generateGroups(parseInt(route));
+                animateStepChange(4, 'ani-next');
+            }
+        }
+
+        function prevStep(s) { animateStepChange(s - 1, 'ani-prev'); }
+
+        function submitForm() {
+            if(!document.getElementById('groupVal').value) return Swal.fire({icon:'warning', text:'กรุณาเลือกกลุ่มเข้าฐาน 1 กลุ่มครับ'});
+            if(!document.getElementById('source').value || !document.getElementById('followPage').value) return Swal.fire({icon:'warning', text:'กรุณาตอบแบบสำรวจให้ครบถ้วน'});
+            if(document.getElementById('followPage').value === 'ติดตาม' && !document.getElementById('followPlatform').value) return Swal.fire({icon:'warning', text:'กรุณาเลือกแพลตฟอร์มที่ติดตาม'});
+
+            const btn = document.getElementById('btnSubmit');
+            const originHtml = btn.innerHTML;
+            btn.innerHTML = '<i class="fi fi-sr-spinner animate-spin"></i> กำลังบันทึก...';
+            btn.disabled = true;
+
+            const payload = {
+                action: 'register',
+                type: 'normal',
+                grade: document.getElementById('grade').value,
+                prefix: document.getElementById('prefix').value,
+                fname: document.getElementById('fname').value.trim(),
+                lname: document.getElementById('lname').value.trim(),
+                phone: document.getElementById('phone').value,
+                email: document.getElementById('email').value.trim(),
+                school: document.getElementById('schoolSearch').value.trim(),
+                province: document.getElementById('province').value,
+                favcourse: document.getElementById('favcourse').value,
+                route: 'Route ' + document.getElementById('routeVal').value,
+                group: document.getElementById('groupVal').value,
+                source: document.getElementById('source').value,
+                follow: document.getElementById('followPage').value,
+                platform: document.getElementById('followPage').value === 'ติดตาม' ? document.getElementById('followPlatform').value : '-'
+            };
+
+            fetch(SCRIPT_URL, {
+                method: 'POST',
+                body: JSON.stringify(payload)
+            }).then(r => r.json()).then(res => {
+                if(res.status === 'success') {
+                    currentEpassData = res.data; // Store globally for buttons
+                    
+                    // ซ่อน Form แล้วโชว์ Success View ทันที ไม่ต้องมี Popup ถาม
+                    document.getElementById('formStepper').classList.add('hidden');
+                    document.getElementById('regForm').classList.add('hidden');
+                    
+                    // เอาข้อมูลใส่ในบัตร
+                    document.getElementById('epass-name').innerText = currentEpassData.name;
+                    document.getElementById('epass-grade').innerText = document.getElementById('grade').value;
+                    document.getElementById('epass-route').innerText = currentEpassData.route;
+                    document.getElementById('epass-group').innerText = currentEpassData.group;
+                    document.getElementById('epass-id').innerText = currentEpassData.id;
+                    
+                    // 🌟 ดึง QR Code ผ่าน QuickChart โดยตรง ป้องกันปัญหาจาก Google Drive Viewer 🌟
+                    document.getElementById('epass-qr').src = "https://quickchart.io/qr?size=400x400&margin=2&text=" + encodeURIComponent(currentEpassData.id); 
+                    
+                    document.getElementById('successView').classList.remove('hidden');
+                    document.getElementById('successView').classList.add('flex');
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                } else {
+                    Swal.fire('ข้อผิดพลาด', res.message, 'error').then(() => {
+                        fetch(SCRIPT_URL + "?action=getQuotas&type=normal").then(r => r.json()).then(data => {
+                            quotaData = data;
+                            generateGroups(parseInt(document.getElementById('routeVal').value));
+                        });
+                    });
+                    btn.innerHTML = originHtml; btn.disabled = false;
+                }
+            }).catch(e => {
+                Swal.fire('Error', 'ไม่สามารถเชื่อมต่อระบบได้ กรุณาลองใหม่', 'error');
+                btn.innerHTML = originHtml; btn.disabled = false;
+            });
+        }
+
+        function downloadTicket() {
+            const btn = event.currentTarget;
+            const originHtml = btn.innerHTML;
+            btn.innerHTML = '<i class="fi fi-sr-spinner-third animate-spin"></i> โหลด...';
+            
+            const ticket = document.getElementById('ticket-capture');
+            html2canvas(ticket, { useCORS: true, scale: 2, backgroundColor: null }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = `EPASS_${currentEpassData.id}.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+                btn.innerHTML = originHtml;
+            }).catch(e => {
+                btn.innerHTML = originHtml;
+                Swal.fire('Error', 'ไม่สามารถสร้างรูปภาพได้ โปรดแคปหน้าจอด้วยตนเอง', 'error');
+            });
+        }
+
+        function sendTicketEmail() {
+            const btn = event.currentTarget;
+            const originHtml = btn.innerHTML;
+            btn.innerHTML = '<i class="fi fi-sr-spinner-third animate-spin"></i> ส่ง...';
+            
+            fetch(SCRIPT_URL, {
+                method: 'POST',
+                body: JSON.stringify({ action: 'sendMail', id: currentEpassData.id, email: currentEpassData.email, name: currentEpassData.name, qr: currentEpassData.qr })
+            }).then(r => r.json()).then(res => {
+                btn.innerHTML = originHtml;
+                if(res.status === 'success') Swal.fire({icon: 'success', title: 'ส่งอีเมลสำเร็จ', text: `ระบบได้ส่งตั๋วไปที่ ${currentEpassData.email} เรียบร้อยแล้ว`, confirmButtonColor: '#0ea5e9'});
+                else Swal.fire('ผิดพลาด', res.message, 'error');
+            }).catch(e => {
+                btn.innerHTML = originHtml;
+                Swal.fire('Error', 'ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ส่งเมลได้', 'error');
+            });
+        }
+
+        function addToCalendar() {
+            const EVENT_DATE = "20261011T003000Z/20261011T090000Z"; 
+            const title = encodeURIComponent("CRA OPENHOUSE 2027 กิจกรรมฐานการเรียนรู้ทางการแพทย์");
+            const details = encodeURIComponent(`รหัส E-PASS ของคุณ: ${currentEpassData.id}\nเส้นทาง: ${currentEpassData.route}\nกลุ่ม: ${currentEpassData.group}\n\nสถานที่: ห้อง Convention Hall ชั้น 6 อาคารกรมพระศรีสวางควัฒน โรงพยาบาลจุฬาภรณ์`);
+            const location = encodeURIComponent("Chulabhorn Hospital (อาคารกรมพระศรีสวางควัฒน)");
+            window.open(`https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${EVENT_DATE}&details=${details}&location=${location}`, '_blank');
+        }
+
+        function reportIssue() {
+            Swal.fire({
+                title: 'พบปัญหาอะไรแจ้งมาได้เลยครับ',
+                input: 'textarea',
+                inputLabel: 'ระบุปัญหา เช่น พิมพ์ชื่อผิด, เปลี่ยนชื่อ-สกุล',
+                inputPlaceholder: 'พิมพ์ข้อความที่นี่...',
+                showCancelButton: true,
+                confirmButtonText: 'ส่งเรื่อง',
+                cancelButtonText: 'ยกเลิก',
+                confirmButtonColor: '#e11d48',
+                customClass: { popup: 'rounded-2xl', confirmButton: 'rounded-xl', cancelButton: 'rounded-xl' }
+            }).then(res => {
+                if(res.isConfirmed && res.value) {
+                    Swal.fire({ title: 'กำลังส่งข้อมูล...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+                    fetch(SCRIPT_URL, {
+                        method: 'POST',
+                        body: JSON.stringify({ action: 'reportIssue', id: currentEpassData.id, issue: res.value })
+                    }).then(r => r.json()).then(r => {
+                        Swal.fire({icon: 'success', title: 'ได้รับเรื่องแล้ว', text: 'แอดมินจะรีบดำเนินการตรวจสอบและแก้ไขให้ครับ', confirmButtonColor: '#0ea5e9'});
+                    }).catch(e => {
+                        Swal.fire('Error', 'ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้', 'error');
+                    });
+                }
+            });
+        }
+    </script>
+</body>
+</html>
