@@ -53,8 +53,6 @@
         .time-block { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 0.75rem; padding: 0.5rem; min-width: 3.5rem; text-align: center; box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.02); }
         .time-val { font-size: 1.25rem; font-weight: 900; color: #1e3a8a; line-height: 1; }
         .time-label { font-size: 0.65rem; color: #64748b; font-weight: 600; margin-top: 0.25rem; text-transform: uppercase; }
-
-        .hidden { display: none !important; }
     </style>
 </head>
 <body class="bg-slate-50 min-h-screen text-slate-800 flex flex-col justify-center items-center relative p-4">
@@ -105,53 +103,23 @@
                     <div class="time-block"><div class="time-val" id="mins">00</div><div class="time-label">นาที</div></div>
                     <div class="time-block"><div class="time-val" id="secs">00</div><div class="time-label">วินาที</div></div>
                 </div>
-                <p class="text-xs text-slate-500 font-medium mt-2 mb-6">ระบบเปิดวันที่ 25 กันยายน 2569 เวลา 10:00 น.</p>
+                <p id="system-notice" class="text-sm font-semibold text-rose-500 mt-4 mb-2 bg-rose-50 p-3 rounded-xl border border-rose-100 inline-block">
+                    * ระบบจะเปิดใช้งานในวันที่ 25 กันยายน 2569 เวลา 10:00 น. *
+                </p>
             </div>
 
             <div class="flex flex-col sm:flex-row gap-4 justify-center max-w-xl mx-auto">
                 <a href="register.html" id="btn-register" class="flex-1 btn-disabled py-4 font-black text-lg flex items-center justify-center gap-2 no-underline pointer-events-none">
                     <i class="fi fi-sr-lock mt-0.5" id="reg-icon"></i> <span id="reg-text">รอก่อนนะ</span>
                 </a>
-                <a href="epass.html" id="btn-epass" class="flex-1 btn-outline py-4 font-black text-lg flex items-center justify-center gap-2 no-underline opacity-50 pointer-events-none">
-                    <i class="fi fi-sr-id-badge mt-0.5"></i> E-PASS เข้างาน
+                <a href="epass.html" id="btn-epass" class="flex-1 btn-disabled py-4 font-black text-lg flex items-center justify-center gap-2 no-underline pointer-events-none">
+                    <i class="fi fi-sr-lock mt-0.5" id="epass-icon"></i> <span id="epass-text">ระบบปิดอยู่</span>
                 </a>
             </div>
         </div>
     </div>
 
-    <button id="btn-report" onclick="reportIssue()" class="floating-btn w-14 h-14 bg-rose-500 hover:bg-rose-600 text-white rounded-full shadow-lg flex items-center justify-center transition-transform hover:scale-110 hidden">
-        <i class="fi fi-sr-headset text-2xl mt-1"></i>
-    </button>
-
     <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx792pTv4hvqt2tsQA3_Dv4sodtm1U67XOtTTvW5YpgoFIIuTxbNQFdQHGFlcd8HUBiIw/exec"; 
-
-        function reportIssue() {
-            Swal.fire({
-                title: 'แจ้งปัญหาการใช้งาน',
-                input: 'textarea',
-                inputLabel: 'ระบุปัญหา เช่น พิมพ์ชื่อผิด, ห้ามสิทธิ์',
-                inputPlaceholder: 'พิมพ์ข้อความที่นี่...',
-                showCancelButton: true,
-                confirmButtonText: 'ส่งเรื่อง',
-                cancelButtonText: 'ยกเลิก',
-                confirmButtonColor: '#e11d48',
-                customClass: { popup: 'rounded-3xl', confirmButton: 'rounded-xl px-6', cancelButton: 'rounded-xl px-6' }
-            }).then(res => {
-                if(res.isConfirmed && res.value) {
-                    Swal.fire({ title: 'กำลังส่งข้อมูล...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
-                    fetch(SCRIPT_URL, {
-                        method: 'POST',
-                        body: JSON.stringify({ action: 'reportIssue', id: 'หน้าหลัก', issue: res.value })
-                    }).then(r => r.json()).then(r => {
-                        Swal.fire({icon: 'success', title: 'ได้รับเรื่องแล้ว', text: 'แอดมินจะรีบดำเนินการตรวจสอบให้ครับ', confirmButtonColor: '#0ea5e9', customClass: {popup: 'rounded-3xl'}});
-                    }).catch(e => {
-                        Swal.fire('Error', 'ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้', 'error');
-                    });
-                }
-            });
-        }
-
         // Set the target date: September 25, 2026 at 10:00:00 (Month is 0-indexed, so 8 = September)
         const targetDate = new Date(2026, 8, 25, 10, 0, 0).getTime();
 
@@ -160,27 +128,29 @@
             const distance = targetDate - now;
 
             const btnReg = document.getElementById('btn-register');
-            const btnEpass = document.getElementById('btn-epass');
-            const btnReport = document.getElementById('btn-report');
             const regIcon = document.getElementById('reg-icon');
             const regText = document.getElementById('reg-text');
+            
+            const btnEpass = document.getElementById('btn-epass');
+            const epassIcon = document.getElementById('epass-icon');
+            const epassText = document.getElementById('epass-text');
+            
             const countdownWrapper = document.getElementById('countdown-wrapper');
 
             if (distance < 0) {
                 // Time has reached - Open Registration
                 countdownWrapper.style.display = "none"; // Hide countdown
                 
-                // Enable button
+                // Enable buttons
                 btnReg.className = "flex-1 btn-primary py-4 font-black text-lg flex items-center justify-center gap-2 no-underline cursor-pointer";
                 btnReg.style.pointerEvents = "auto";
                 regIcon.className = "fi fi-sr-user-add mt-0.5";
                 regText.innerText = "ลงทะเบียน";
-
-                // Enable E-PASS
-                btnEpass.classList.remove('opacity-50', 'pointer-events-none');
-
-                // Enable report button
-                btnReport.classList.remove('hidden');
+                
+                btnEpass.className = "flex-1 btn-outline py-4 font-black text-lg flex items-center justify-center gap-2 no-underline cursor-pointer";
+                btnEpass.style.pointerEvents = "auto";
+                epassIcon.className = "fi fi-sr-id-badge mt-0.5";
+                epassText.innerText = "E-PASS เข้างาน";
                 
                 return; // Stop the function
             }
