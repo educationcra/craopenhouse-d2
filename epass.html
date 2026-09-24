@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>E-PASS เข้างาน - CRA OPENHOUSE 2027</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel='stylesheet' href='https://cdn-uicons.flaticon.com/2.1.0/uicons-solid-rounded/css/uicons-solid-rounded.css'>
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        cra: { 50: '#f0f9ff', 100: '#e0f2fe', 400: '#38bdf8', 500: '#0ea5e9', 600: '#0284c7', 700: '#0369a1', 900: '#1e3a8a' },
+                        mint: { 50: '#ecfdf5', 400: '#34d399', 500: '#10b981', 600: '#059669' },
+                        orange: { 50: '#fff7ed', 500: '#f97316', 600: '#ea580c' }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body { font-family: 'Noto Sans Thai', sans-serif; -webkit-tap-highlight-color: transparent; background-color: #f8fafc; overflow-x: hidden;}
+        .main-container { background: #ffffff; border-radius: 2.5rem; box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.05); border: 1px solid #f1f5f9; position: relative; z-index: 1; }
+        
+        .floating-bg { position: fixed; inset: 0; overflow: hidden; pointer-events: none; z-index: -40; }
+        .float-icon { position: absolute; bottom: -10%; opacity: 0; color: rgba(30, 58, 138, 0.04); animation: floatUp linear infinite; }
+        @keyframes floatUp { 0% { transform: translateY(10vh) rotate(0deg) scale(0.8); opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { transform: translateY(-110vh) rotate(360deg) scale(1.5); opacity: 0; } }
+
+        .input-glass { width: 100%; padding: 1.25rem 1.5rem; border-radius: 1.25rem; border: 2px solid #e2e8f0; background: #ffffff; outline: none; transition: all 0.25s ease; font-weight: 700; color: #0f172a; font-size: 1.25rem; text-align: center; letter-spacing: 0.1em;}
+        .input-glass:focus { border-color: #0ea5e9; box-shadow: 0 4px 20px rgba(14, 165, 233, 0.1); background-color: #f0f9ff; }
+
+        .btn-primary { background: linear-gradient(135deg, #1e3a8a 0%, #0369a1 100%); color: white; transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1); box-shadow: 0 10px 25px -5px rgba(30, 58, 138, 0.4); border-radius: 1.25rem;}
+        .btn-primary:hover:not(:disabled) { transform: translateY(-3px); box-shadow: 0 15px 35px -5px rgba(30, 58, 138, 0.5); background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%); }
+        .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; box-shadow: none; transform: none; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen text-slate-800 flex flex-col justify-center items-center relative p-4">
+
+    <div class="fixed top-[-10%] left-[-10%] w-[50%] h-[50%] bg-cra-400 rounded-full mix-blend-multiply filter blur-[120px] opacity-10 pointer-events-none z-[-1]"></div>
+    <div class="fixed bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-mint-400 rounded-full mix-blend-multiply filter blur-[120px] opacity-10 pointer-events-none z-[-1]"></div>
+    
+    <div class="floating-bg">
+        <i class="fi fi-sr-id-badge float-icon" style="left: 20%; font-size: 4rem; animation-duration: 25s; animation-delay: 0s;"></i>
+        <i class="fi fi-sr-qr-scan float-icon" style="left: 70%; font-size: 5rem; animation-duration: 22s; animation-delay: 5s;"></i>
+    </div>
+
+    <div class="w-full max-w-[500px]">
+        <a href="index.html" class="inline-flex items-center gap-2 text-slate-500 hover:text-cra-600 font-bold bg-white px-5 py-3 rounded-2xl shadow-sm border border-slate-100 transition-colors text-sm mb-6 no-underline">
+            <i class="fi fi-sr-arrow-small-left text-xl mt-0.5"></i> กลับหน้าหลัก
+        </a>
+
+        <div class="main-container p-8 md:p-10 text-center overflow-hidden">
+            <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-cra-900 via-cra-500 to-mint-400"></div>
+
+            <!-- Login View -->
+            <div id="loginView" class="animate-[fadeIn_0.5s_ease-out]">
+                <div class="w-20 h-20 bg-cra-50 rounded-full flex items-center justify-center mx-auto mb-6 shadow-inner border-2 border-cra-100">
+                    <i class="fi fi-sr-mobile-notch text-4xl text-cra-500 mt-1"></i>
+                </div>
+                <h1 class="text-3xl font-black text-cra-900 mb-2">ค้นหา E-PASS</h1>
+                <p class="text-slate-500 font-medium mb-8">กรอกเบอร์โทรศัพท์มือถือที่ใช้ลงทะเบียน</p>
+
+                <input type="tel" id="loginPhone" class="input-glass mb-6" placeholder="0XX-XXX-XXXX" maxlength="12" oninput="formatPhone(this)">
+                
+                <button id="btnSearch" onclick="loginEpass()" class="w-full btn-primary py-4 font-black text-lg flex items-center justify-center gap-2">
+                    เข้าสู่ระบบ <i class="fi fi-sr-arrow-right mt-0.5"></i>
+                </button>
+            </div>
+
+            <!-- Ticket View -->
+            <div id="ticketView" class="hidden flex-col items-center animate-[fadeIn_0.5s_ease-out]">
+                <div id="checkinStatus" class="hidden w-full bg-green-100 text-green-700 p-3 rounded-xl border border-green-200 font-bold text-sm mb-6 flex items-center justify-center gap-2">
+                    <i class="fi fi-sr-badge-check text-lg"></i> <span id="checkinText">เช็คอินเข้างานเรียบร้อยแล้ว</span>
+                </div>
+
+                <div id="ticket-capture" class="bg-gradient-to-br from-cra-900 to-slate-900 rounded-[2.5rem] p-8 pb-10 text-white shadow-2xl relative overflow-hidden w-full max-w-[380px] text-center mb-8 border border-slate-700">
+                    <div class="absolute top-0 right-0 w-32 h-32 bg-cra-500 rounded-full mix-blend-screen filter blur-[40px] opacity-40"></div>
+                    
+                    <p class="text-[11px] text-slate-300 font-black mb-0.5 tracking-widest uppercase mt-4">CRA OPENHOUSE 2027</p>
+                    <p class="text-[9px] text-slate-400 font-bold mb-4 leading-relaxed px-2">กิจกรรมฐานการเรียนรู้ทางการแพทย์ โรงพยาบาลจุฬาภรณ์</p>
+                    
+                    <div class="text-2xl font-black mb-1 drop-shadow-md text-white truncate px-2" id="epass-name">--</div>
+                    <div class="text-sm font-bold text-cra-300 mb-6 truncate px-2" id="epass-grade">--</div>
+
+                    <div class="flex justify-center gap-3 mb-6">
+                        <div class="bg-white/10 backdrop-blur px-4 py-2 rounded-xl border border-white/20 w-1/2">
+                            <p class="text-[10px] text-slate-400 font-bold uppercase mb-0.5">ROUTE</p>
+                            <p class="text-lg font-black text-cra-400" id="epass-route">--</p>
+                        </div>
+                        <div class="bg-white/10 backdrop-blur px-4 py-2 rounded-xl border border-white/20 w-1/2">
+                            <p class="text-[10px] text-slate-400 font-bold uppercase mb-0.5">GROUP</p>
+                            <p class="text-lg font-black text-mint-400" id="epass-group">--</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-3.5 rounded-2xl inline-block shadow-inner mx-auto relative mb-4">
+                        <img id="epass-qr" src="" class="w-40 h-40 object-contain rounded-xl" crossorigin="anonymous">
+                    </div>
+                    <div class="text-lg font-black tracking-widest text-slate-300" id="epass-id">--</div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3 w-full max-w-[380px]">
+                    <button type="button" onclick="downloadTicket()" class="bg-cra-600 hover:bg-cra-700 text-white py-3.5 rounded-xl font-bold transition-all shadow-md flex justify-center items-center gap-2 text-sm">
+                        <i class="fi fi-sr-download"></i> ดาวน์โหลด
+                    </button>
+                    <button type="button" onclick="sendTicketEmail()" class="bg-slate-50 hover:bg-slate-100 text-slate-700 py-3.5 rounded-xl font-bold transition-all shadow-sm flex justify-center items-center gap-2 text-sm border-2 border-slate-200">
+                        <i class="fi fi-sr-envelope"></i> ส่งเข้าอีเมล
+                    </button>
+                    <button type="button" onclick="addToCalendar()" class="bg-slate-50 hover:bg-slate-100 text-slate-700 py-3.5 rounded-xl font-bold transition-all shadow-sm flex justify-center items-center gap-2 text-sm border-2 border-slate-200">
+                        <i class="fi fi-sr-calendar-plus"></i> ลง Calendar
+                    </button>
+                    <button type="button" onclick="reportIssue()" class="bg-rose-50 hover:bg-rose-100 text-rose-600 py-3.5 rounded-xl font-bold transition-all shadow-sm flex justify-center items-center gap-2 text-sm border-2 border-rose-200">
+                        <i class="fi fi-sr-headset"></i> แจ้งปัญหา
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx792pTv4hvqt2tsQA3_Dv4sodtm1U67XOtTTvW5YpgoFIIuTxbNQFdQHGFlcd8HUBiIw/exec"; 
+        let currentEpassData = null;
+
+        function formatPhone(el) {
+            let v = el.value.replace(/\D/g,'');
+            if(v.length > 10) v = v.substring(0,10);
+            if(v.length > 6) el.value = v.substring(0,3)+'-'+v.substring(3,6)+'-'+v.substring(6);
+            else if(v.length > 3) el.value = v.substring(0,3)+'-'+v.substring(3);
+            else el.value = v;
+        }
+
+        function loginEpass() {
+            const phone = document.getElementById('loginPhone').value;
+            if(phone.length !== 12) return Swal.fire('แจ้งเตือน', 'กรุณากรอกเบอร์โทรศัพท์ 10 หลักให้ครบถ้วน', 'warning');
+            
+            const btn = document.getElementById('btnSearch');
+            const originHtml = btn.innerHTML;
+            btn.innerHTML = '<i class="fi fi-sr-spinner animate-spin"></i> กำลังค้นหา...'; btn.disabled = true;
+
+            fetch(SCRIPT_URL, {
+                method: 'POST',
+                body: JSON.stringify({ action: 'login', phone: phone })
+            }).then(r => r.json()).then(res => {
+                btn.innerHTML = originHtml; btn.disabled = false;
+                if(res.status === 'success') {
+                    currentEpassData = res.data;
+                    document.getElementById('loginView').style.display = 'none';
+                    document.getElementById('ticketView').classList.remove('hidden');
+                    document.getElementById('ticketView').classList.add('flex');
+                    
+                    document.getElementById('epass-name').innerText = currentEpassData.name;
+                    document.getElementById('epass-grade').innerText = currentEpassData.school; // DB holds grade or school here depending on GS logic
+                    document.getElementById('epass-route').innerText = currentEpassData.route;
+                    document.getElementById('epass-group').innerText = currentEpassData.group;
+                    document.getElementById('epass-id').innerText = currentEpassData.id;
+                    document.getElementById('epass-qr').src = "https://quickchart.io/qr?size=400x400&margin=2&text=" + encodeURIComponent(currentEpassData.id);
+
+                    if(currentEpassData.status === 'มาแล้ว') {
+                        const statusBox = document.getElementById('checkinStatus');
+                        statusBox.classList.remove('hidden');
+                        document.getElementById('checkinText').innerText = `สแกนเข้างานแล้วเมื่อ ${currentEpassData.time}`;
+                    }
+                } else {
+                    Swal.fire('ไม่พบข้อมูล', res.message, 'error');
+                }
+            }).catch(e => { btn.innerHTML = originHtml; btn.disabled = false; Swal.fire('Error', 'ไม่สามารถเชื่อมต่อระบบได้', 'error'); });
+        }
+
+        function downloadTicket() {
+            const btn = event.currentTarget; const originHtml = btn.innerHTML; btn.innerHTML = '<i class="fi fi-sr-spinner-third animate-spin"></i> โหลด...';
+            const ticket = document.getElementById('ticket-capture');
+            html2canvas(ticket, { useCORS: true, scale: 2, backgroundColor: null }).then(canvas => {
+                const link = document.createElement('a'); link.download = `EPASS_${currentEpassData.id}.png`; link.href = canvas.toDataURL('image/png'); link.click(); btn.innerHTML = originHtml;
+            }).catch(e => { btn.innerHTML = originHtml; Swal.fire('Error', 'ไม่สามารถสร้างรูปภาพได้ โปรดแคปหน้าจอด้วยตนเอง', 'error'); });
+        }
+
+        function sendTicketEmail() {
+            const btn = event.currentTarget; const originHtml = btn.innerHTML; btn.innerHTML = '<i class="fi fi-sr-spinner-third animate-spin"></i> ส่ง...';
+            fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'sendMail', id: currentEpassData.id, email: currentEpassData.email, name: currentEpassData.name, qr: currentEpassData.qr }) }).then(r => r.json()).then(res => {
+                btn.innerHTML = originHtml;
+                if(res.status === 'success') Swal.fire({icon: 'success', title: 'ส่งอีเมลสำเร็จ', text: `ระบบได้ส่งตั๋วไปที่ ${currentEpassData.email} เรียบร้อยแล้ว`, confirmButtonColor: '#0ea5e9'});
+                else Swal.fire('ผิดพลาด', res.message, 'error');
+            }).catch(e => { btn.innerHTML = originHtml; Swal.fire('Error', 'ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ส่งเมลได้', 'error'); });
+        }
+
+        function addToCalendar() {
+            const EVENT_DATE = "20261011T003000Z/20261011T090000Z"; 
+            const title = encodeURIComponent("CRA OPENHOUSE 2027 กิจกรรมฐานการเรียนรู้ทางการแพทย์");
+            const details = encodeURIComponent(`รหัส E-PASS ของคุณ: ${currentEpassData.id}\nเส้นทาง: ${currentEpassData.route}\nกลุ่ม: ${currentEpassData.group}\n\nสถานที่: ห้อง Convention Hall ชั้น 6 อาคารกรมพระศรีสวางควัฒน โรงพยาบาลจุฬาภรณ์`);
+            const location = encodeURIComponent("Chulabhorn Hospital (อาคารกรมพระศรีสวางควัฒน)");
+            window.open(`https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${EVENT_DATE}&details=${details}&location=${location}`, '_blank');
+        }
+
+        function reportIssue() {
+            Swal.fire({
+                title: 'พบปัญหาอะไรแจ้งมาได้เลยครับ', input: 'textarea', inputLabel: 'ระบุปัญหา เช่น พิมพ์ชื่อผิด, เปลี่ยนชื่อ-สกุล', inputPlaceholder: 'พิมพ์ข้อความที่นี่...', showCancelButton: true, confirmButtonText: 'ส่งเรื่อง', cancelButtonText: 'ยกเลิก', confirmButtonColor: '#e11d48', customClass: { popup: 'rounded-2xl', confirmButton: 'rounded-xl', cancelButton: 'rounded-xl' }
+            }).then(res => {
+                if(res.isConfirmed && res.value) {
+                    Swal.fire({ title: 'กำลังส่งข้อมูล...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+                    fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'reportIssue', id: currentEpassData.id, issue: res.value }) }).then(r => r.json()).then(r => { Swal.fire({icon: 'success', title: 'ได้รับเรื่องแล้ว', text: 'แอดมินจะรีบดำเนินการตรวจสอบและแก้ไขให้ครับ', confirmButtonColor: '#0ea5e9'}); }).catch(e => { Swal.fire('Error', 'ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้', 'error'); });
+                }
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>CRA OPENHOUSE 2027</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel='stylesheet' href='https://cdn-uicons.flaticon.com/2.1.0/uicons-solid-rounded/css/uicons-solid-rounded.css'>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        cra: { 50: '#f0f9ff', 100: '#e0f2fe', 400: '#38bdf8', 500: '#0ea5e9', 600: '#0284c7', 700: '#0369a1', 900: '#1e3a8a' },
+                        mint: { 50: '#ecfdf5', 400: '#34d399', 500: '#10b981', 600: '#059669' },
+                        orange: { 50: '#fff7ed', 500: '#f97316', 600: '#ea580c' }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body { font-family: 'Noto Sans Thai', sans-serif; -webkit-tap-highlight-color: transparent; background-color: #f8fafc; overflow-x: hidden;}
+        
+        .main-container { background: #ffffff; border-radius: 2.5rem; box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.05); border: 1px solid #f1f5f9; position: relative; z-index: 1; overflow: hidden;}
+        
+        /* Floating Background Icons */
+        .floating-bg { position: fixed; inset: 0; overflow: hidden; pointer-events: none; z-index: -40; }
+        .float-icon { position: absolute; bottom: -10%; opacity: 0; color: rgba(30, 58, 138, 0.04); animation: floatUp linear infinite; }
+        @keyframes floatUp {
+            0% { transform: translateY(10vh) rotate(0deg) scale(0.8); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(-110vh) rotate(360deg) scale(1.5); opacity: 0; }
+        }
+
+        .btn-primary { background: linear-gradient(135deg, #1e3a8a 0%, #0369a1 100%); color: white; transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1); box-shadow: 0 10px 25px -5px rgba(30, 58, 138, 0.4); border-radius: 1.25rem;}
+        .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 15px 35px -5px rgba(30, 58, 138, 0.5); background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%); }
+
+        .btn-outline { background: white; color: #0369a1; border: 2px solid #e0f2fe; transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1); border-radius: 1.25rem;}
+        .btn-outline:hover { border-color: #0ea5e9; color: #0ea5e9; transform: translateY(-3px); box-shadow: 0 10px 25px -5px rgba(14, 165, 233, 0.15); }
+
+        .floating-btn { position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 50; }
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen text-slate-800 flex flex-col justify-center items-center relative p-4">
+
+    <div class="fixed top-[-10%] left-[-10%] w-[50%] h-[50%] bg-cra-400 rounded-full mix-blend-multiply filter blur-[120px] opacity-10 pointer-events-none z-[-1]"></div>
+    <div class="fixed bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-mint-400 rounded-full mix-blend-multiply filter blur-[120px] opacity-10 pointer-events-none z-[-1]"></div>
+    
+    <div class="floating-bg">
+        <i class="fi fi-sr-stethoscope float-icon" style="left: 10%; font-size: 4rem; animation-duration: 25s; animation-delay: 0s;"></i>
+        <i class="fi fi-sr-microscope float-icon" style="left: 80%; font-size: 5rem; animation-duration: 22s; animation-delay: 5s;"></i>
+        <i class="fi fi-sr-hospital float-icon" style="left: 30%; font-size: 3rem; animation-duration: 28s; animation-delay: 10s;"></i>
+        <i class="fi fi-sr-user-nurse float-icon" style="left: 65%; font-size: 4.5rem; animation-duration: 24s; animation-delay: 15s;"></i>
+        <i class="fi fi-sr-heart float-icon" style="left: 45%; font-size: 6rem; animation-duration: 30s; animation-delay: 2s;"></i>
+    </div>
+
+    <div class="w-full max-w-4xl main-container">
+        <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-cra-900 via-cra-500 to-mint-400"></div>
+        
+        <div class="p-8 md:p-14 text-center">
+            <!-- Hidden VIP Trigger Area -->
+            <a href="vipreg.html" class="absolute top-0 right-0 w-16 h-16 opacity-0 z-50"></a>
+
+            <div class="w-24 h-24 md:w-32 md:h-32 mx-auto mb-6 bg-cra-50 rounded-full flex items-center justify-center border-4 border-white shadow-lg">
+                <i class="fi fi-sr-pulse text-5xl md:text-6xl text-cra-500 mt-2"></i>
+            </div>
+
+            <h1 class="text-3xl md:text-5xl font-black text-cra-900 mb-3 tracking-tight">CRA OPENHOUSE 2027</h1>
+            <h2 class="text-lg md:text-2xl font-bold text-slate-500 mb-10">กิจกรรมฐานการเรียนรู้ทางการแพทย์ โรงพยาบาลจุฬาภรณ์</h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl mx-auto mb-10">
+                <div class="bg-slate-50 p-5 rounded-2xl border border-slate-100 flex flex-col items-center justify-center">
+                    <i class="fi fi-sr-calendar-star text-3xl text-orange-500 mb-2"></i>
+                    <p class="font-bold text-slate-800">11 ตุลาคม 2569</p>
+                    <p class="text-sm text-slate-500 font-medium">เวลา 07:30 - 16:00 น.</p>
+                </div>
+                <div class="bg-slate-50 p-5 rounded-2xl border border-slate-100 flex flex-col items-center justify-center">
+                    <i class="fi fi-sr-map-marker text-3xl text-cra-500 mb-2"></i>
+                    <p class="font-bold text-slate-800 text-center">ห้อง Convention Hall ชั้น 6</p>
+                    <p class="text-sm text-slate-500 font-medium text-center">อาคารกรมพระศรีสวางควัฒน</p>
+                </div>
+            </div>
+
+            <div class="flex flex-col sm:flex-row gap-4 justify-center max-w-xl mx-auto">
+                <a href="register.html" class="flex-1 btn-primary py-4 font-black text-lg flex items-center justify-center gap-2 no-underline">
+                    <i class="fi fi-sr-user-add mt-0.5"></i> ลงทะเบียน
+                </a>
+                <a href="epass.html" class="flex-1 btn-outline py-4 font-black text-lg flex items-center justify-center gap-2 no-underline">
+                    <i class="fi fi-sr-id-badge mt-0.5"></i> E-PASS เข้างาน
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <button onclick="reportIssue()" class="floating-btn w-14 h-14 bg-rose-500 hover:bg-rose-600 text-white rounded-full shadow-lg flex items-center justify-center transition-transform hover:scale-110">
+        <i class="fi fi-sr-headset text-2xl mt-1"></i>
+    </button>
+
+    <script>
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx792pTv4hvqt2tsQA3_Dv4sodtm1U67XOtTTvW5YpgoFIIuTxbNQFdQHGFlcd8HUBiIw/exec"; 
+
+        function reportIssue() {
+            Swal.fire({
+                title: 'แจ้งปัญหาการใช้งาน',
+                input: 'textarea',
+                inputLabel: 'ระบุปัญหา เช่น พิมพ์ชื่อผิด, ห้ามสิทธิ์',
+                inputPlaceholder: 'พิมพ์ข้อความที่นี่...',
+                showCancelButton: true,
+                confirmButtonText: 'ส่งเรื่อง',
+                cancelButtonText: 'ยกเลิก',
+                confirmButtonColor: '#e11d48',
+                customClass: { popup: 'rounded-3xl', confirmButton: 'rounded-xl px-6', cancelButton: 'rounded-xl px-6' }
+            }).then(res => {
+                if(res.isConfirmed && res.value) {
+                    Swal.fire({ title: 'กำลังส่งข้อมูล...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+                    fetch(SCRIPT_URL, {
+                        method: 'POST',
+                        body: JSON.stringify({ action: 'reportIssue', id: 'หน้าหลัก', issue: res.value })
+                    }).then(r => r.json()).then(r => {
+                        Swal.fire({icon: 'success', title: 'ได้รับเรื่องแล้ว', text: 'แอดมินจะรีบดำเนินการตรวจสอบให้ครับ', confirmButtonColor: '#0ea5e9', customClass: {popup: 'rounded-3xl'}});
+                    }).catch(e => {
+                        Swal.fire('Error', 'ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้', 'error');
+                    });
+                }
+            });
+        }
+    </script>
+</body>
+</html>
