@@ -114,72 +114,86 @@
         .autocomplete-dropdown li { padding: 1rem 1.25rem; border-bottom: 1px solid #f8fafc; cursor: pointer; transition: 0.2s; font-size: 0.95rem; color: #475569; font-weight: 600; display: flex; justify-content: space-between;}
         .autocomplete-dropdown li:hover { background-color: #f0f9ff; color: #0ea5e9; padding-left: 1.5rem; }
 
-        .loader {
-            --color-one: #ffbf48;
-            --color-two: #be4a1d;
-            --color-three: #ffbf4780;
-            --color-four: #bf4a1d80;
-            --color-five: #ffbf4740;
-            --time-animation: 2s;
-            --size: 0.85; 
+        .three-body {
+            --uib-size: 50px;
+            --uib-speed: 0.8s;
+            --uib-color: #0ea5e9;
             position: relative;
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            transform: scale(var(--size));
-            box-shadow: 0 0 25px 0 var(--color-three), 0 20px 50px 0 var(--color-four);
-            animation: colorize calc(var(--time-animation) * 3) ease-in-out infinite;
-            margin: 0 auto 1.5rem auto;
+            display: inline-block;
+            height: var(--uib-size);
+            width: var(--uib-size);
+            animation: spin78236 calc(var(--uib-speed) * 2.5) infinite linear;
         }
 
-        .loader::before {
-            content: "";
+        .three-body__dot {
             position: absolute;
+            height: 100%;
+            width: 30%;
+        }
+
+        .three-body__dot:after {
+            content: '';
+            position: absolute;
+            height: 0%;
+            width: 100%;
+            padding-bottom: 100%;
+            background-color: var(--uib-color);
+            border-radius: 50%;
+        }
+
+        .three-body__dot:nth-child(1) {
+            bottom: 5%;
+            left: 0;
+            transform: rotate(60deg);
+            transform-origin: 50% 85%;
+        }
+
+        .three-body__dot:nth-child(1)::after {
+            bottom: 0;
+            left: 0;
+            animation: wobble1 var(--uib-speed) infinite ease-in-out;
+            animation-delay: calc(var(--uib-speed) * -0.3);
+        }
+
+        .three-body__dot:nth-child(2) {
+            bottom: 5%;
+            right: 0;
+            transform: rotate(-60deg);
+            transform-origin: 50% 85%;
+        }
+
+        .three-body__dot:nth-child(2)::after {
+            bottom: 0;
+            left: 0;
+            animation: wobble1 var(--uib-speed) infinite calc(var(--uib-speed) * -0.15) ease-in-out;
+        }
+
+        .three-body__dot:nth-child(3) {
+            bottom: -5%;
+            left: 0;
+            transform: translateX(116.666%);
+        }
+
+        .three-body__dot:nth-child(3)::after {
             top: 0;
             left: 0;
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            border-top: solid 1px var(--color-one);
-            border-bottom: solid 1px var(--color-two);
-            background: linear-gradient(180deg, var(--color-five), var(--color-four));
-            box-shadow: inset 0 10px 10px 0 var(--color-three), inset 0 -10px 10px 0 var(--color-four);
+            animation: wobble2 var(--uib-speed) infinite ease-in-out;
         }
 
-        .loader .box {
-            width: 100px;
-            height: 100px;
-            background: linear-gradient(180deg, var(--color-one) 30%, var(--color-two) 70%);
-            mask: url(#mask-clipping);
-            -webkit-mask: url(#mask-clipping);
+        @keyframes spin78236 {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
-        .loader svg {
-            position: absolute;
-            width: 0;
-            height: 0;
+        @keyframes wobble1 {
+            0%, 100% { transform: translateY(0%) scale(1); opacity: 1; }
+            50% { transform: translateY(-66%) scale(0.65); opacity: 0.8; }
         }
 
-        .loader svg #clipping {
-            filter: contrast(15);
-            animation: roundness calc(var(--time-animation) / 2) linear infinite;
+        @keyframes wobble2 {
+            0%, 100% { transform: translateY(0%) scale(1); opacity: 1; }
+            50% { transform: translateY(66%) scale(0.65); opacity: 0.8; }
         }
-
-        .loader svg #clipping polygon {
-            filter: blur(7px);
-        }
-
-        .loader svg #clipping polygon:nth-child(1) { transform-origin: 75% 25%; transform: rotate(90deg); }
-        .loader svg #clipping polygon:nth-child(2) { transform-origin: 50% 50%; animation: rotation var(--time-animation) linear infinite reverse; }
-        .loader svg #clipping polygon:nth-child(3) { transform-origin: 50% 60%; animation: rotation var(--time-animation) linear infinite; animation-delay: calc(var(--time-animation) / -3); }
-        .loader svg #clipping polygon:nth-child(4) { transform-origin: 40% 40%; animation: rotation var(--time-animation) linear infinite reverse; }
-        .loader svg #clipping polygon:nth-child(5) { transform-origin: 40% 40%; animation: rotation var(--time-animation) linear infinite reverse; animation-delay: calc(var(--time-animation) / -2); }
-        .loader svg #clipping polygon:nth-child(6) { transform-origin: 60% 40%; animation: rotation var(--time-animation) linear infinite; }
-        .loader svg #clipping polygon:nth-child(7) { transform-origin: 60% 40%; animation: rotation var(--time-animation) linear infinite; animation-delay: calc(var(--time-animation) / -1.5); }
-
-        @keyframes rotation { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        @keyframes roundness { 0%, 60%, 100% { filter: contrast(15); } 20%, 40% { filter: contrast(3); } }
-        @keyframes colorize { 0%, 100% { filter: hue-rotate(0deg); } 20% { filter: hue-rotate(-30deg); } 40% { filter: hue-rotate(-60deg); } 60% { filter: hue-rotate(-90deg); } 80% { filter: hue-rotate(-45deg); } }
 
         /* Route Card List Style */
         .route-card { border: 2px solid #e2e8f0; border-radius: 1.5rem; padding: 0; cursor: pointer; transition: all 0.25s ease; background: #fff; overflow: hidden; display: flex; flex-direction: column; }
@@ -228,24 +242,10 @@
     <div id="loadingScreen" class="fixed inset-0 bg-slate-50/90 backdrop-blur-sm z-[100] flex flex-col items-center justify-center transition-opacity duration-500 p-6">
         <div class="bg-white p-10 md:p-14 text-center max-w-lg w-full rounded-[2.5rem] shadow-2xl border border-slate-100 relative">
             
-            <div class="loader">
-                <div class="box"></div>
-                <svg>
-                    <defs>
-                        <mask id="mask-clipping">
-                            <g id="clipping">
-                                <!-- Polygons for the Gooey Melting Effect -->
-                                <polygon points="50,10 90,80 10,80" fill="white" />
-                                <polygon points="50,20 80,70 20,70" fill="white" />
-                                <polygon points="50,15 85,75 15,75" fill="white" />
-                                <polygon points="50,5 95,85 5,85" fill="white" />
-                                <polygon points="50,25 75,65 25,65" fill="white" />
-                                <polygon points="50,30 70,60 30,60" fill="white" />
-                                <polygon points="50,0 100,90 0,90" fill="white" />
-                            </g>
-                        </mask>
-                    </defs>
-                </svg>
+            <div class="three-body mb-6">
+                <div class="three-body__dot"></div>
+                <div class="three-body__dot"></div>
+                <div class="three-body__dot"></div>
             </div>
 
             <h2 class="text-2xl md:text-3xl font-black text-cra-900 mb-2 tracking-tight mt-4">กำลังซิงค์ข้อมูล</h2>
@@ -258,7 +258,6 @@
             <a href="index.html" class="flex items-center gap-2 text-slate-500 hover:text-cra-600 font-bold bg-white px-5 py-3 rounded-2xl shadow-sm border border-slate-100 transition-colors text-sm">
                 <i class="fi fi-sr-arrow-small-left text-xl mt-0.5"></i> กลับหน้าหลัก
             </a>
-            <img src="https://i.postimg.cc/qzxLdhxJ/LOGO-CRAOH2027-01.png" alt="CRA Logo" class="h-10 object-contain">
         </div>
 
         <div class="w-full max-w-[850px] main-container">
@@ -352,7 +351,7 @@
                                 <label class="input-label">อีเมล<span class="req">*</span></label>
                                 <div class="input-container relative">
                                     <i class="fi fi-sr-envelope input-icon"></i>
-                                    <input type="email" id="email" class="input-field" placeholder="example@gmail.com" autocomplete="off" oninput="showEmailGuide(this)">
+                                    <input type="email" id="email" class="input-field" placeholder="example@gmail.com" autocomplete="off" oninput="formatEmail(this); showEmailGuide(this)">
                                     <ul id="emailDropdown" class="autocomplete-dropdown"></ul>
                                 </div>
                             </div>
@@ -594,7 +593,7 @@
                     <div id="ticket-capture" class="bg-gradient-to-br from-cra-900 to-slate-800 rounded-[2.5rem] p-8 pb-10 text-white shadow-2xl relative overflow-hidden w-full max-w-[380px] text-center mb-8 border border-slate-700">
                         <div class="absolute top-0 right-0 w-32 h-32 bg-cra-500 rounded-full mix-blend-screen filter blur-[40px] opacity-40"></div>
                         
-                        <p class="text-[11px] text-slate-300 font-black mb-0.5 tracking-widest uppercase">CRA OPENHOUSE 2027</p>
+                        <p class="text-[11px] text-slate-300 font-black mb-0.5 tracking-widest uppercase mt-4">CRA OPENHOUSE 2027</p>
                         <p class="text-[9px] text-slate-400 font-bold mb-4 leading-relaxed px-2">กิจกรรมฐานการเรียนรู้ทางการแพทย์ โรงพยาบาลจุฬาภรณ์</p>
                         
                         <div class="text-2xl font-black mb-1 drop-shadow-md text-white truncate px-2" id="epass-name">--</div>
@@ -844,9 +843,14 @@
             drop.innerHTML = emailDomains.map(d => `<li onclick="applyEmail('${val}${d}')"><span class="font-medium text-slate-800">${val}<b class="text-cra-500">${d}</b></span></li>`).join('');
             drop.style.display = 'block';
         }
+
         function applyEmail(fullEmail) {
             document.getElementById('email').value = fullEmail;
             document.getElementById('emailDropdown').style.display = 'none';
+        }
+
+        function formatEmail(el) {
+            el.value = el.value.replace(/[^a-zA-Z0-9@._-]/g, '');
         }
 
         function formatPhone(el) {
