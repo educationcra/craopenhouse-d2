@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ลงทะเบียน VIP - CRA OPENHOUSE 2027</title>
+    <title>ลงทะเบียน - CRA OPENHOUSE 2027</title>
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -190,7 +190,7 @@
                 <div class="three-body__dot"></div>
                 <div class="three-body__dot"></div>
             </div>
-            <h2 class="text-2xl md:text-3xl font-black text-vip-900 mb-2 tracking-tight mt-4">กำลังซิงค์ข้อมูล VIP</h2>
+            <h2 class="text-2xl md:text-3xl font-black text-vip-900 mb-2 tracking-tight mt-4">กำลังซิงค์ข้อมูล</h2>
             <p class="text-slate-500 font-medium mb-2">อัปเดตโควตาที่นั่งแบบ Real-time...</p>
         </div>
     </div>
@@ -198,7 +198,7 @@
     <div class="flex-grow flex flex-col items-center py-6 md:py-10 px-4 w-full opacity-0 hidden transition-opacity duration-700" id="mainContent">
         <div class="w-full max-w-[850px] flex justify-between items-center mb-6">
             <div class="font-black text-vip-600 bg-vip-50 px-5 py-3 rounded-2xl shadow-sm border border-vip-100 text-sm flex items-center gap-2">
-                <i class="fi fi-sr-crown text-xl mt-0.5"></i> VIP REGISTRATION
+                <i class="fi fi-sr-crown text-xl mt-0.5"></i> REGISTRATION
             </div>
         </div>
 
@@ -240,7 +240,7 @@
                         <div class="flex items-center gap-4 mb-8 border-b-2 border-slate-50 pb-5">
                             <div class="w-14 h-14 bg-vip-50 rounded-2xl flex items-center justify-center text-vip-600 border border-vip-100 shadow-sm"><i class="fi fi-sr-user text-2xl mt-1"></i></div>
                             <div>
-                                <h2 class="text-2xl font-black text-vip-900 tracking-tight">1. ข้อมูลส่วนตัว (VIP)</h2>
+                                <h2 class="text-2xl font-black text-vip-900 tracking-tight">1. ข้อมูลส่วนตัว</h2>
                                 <p class="text-slate-500 font-medium text-sm">โปรดระบุข้อมูลให้ถูกต้องครบถ้วน 1 เบอร์ ต่อ 1 สิทธิ์</p>
                             </div>
                         </div>
@@ -952,7 +952,7 @@
 
         function addToCalendar() {
             const EVENT_DATE = "20261011T003000Z/20261011T090000Z"; 
-            const title = encodeURIComponent("CRA OPENHOUSE 2027 กิจกรรมฐานการเรียนรู้ทางการแพทย์ (VIP)");
+            const title = encodeURIComponent("CRA OPENHOUSE 2027 กิจกรรมฐานการเรียนรู้ทางการแพทย์");
             const details = encodeURIComponent(`รหัส E-PASS ของคุณ: ${currentEpassData.id}\nเส้นทาง: ${currentEpassData.route}\nกลุ่ม: ${currentEpassData.group}\n\nสถานที่: ห้อง Convention Hall ชั้น 6 อาคารกรมพระศรีสวางควัฒน โรงพยาบาลจุฬาภรณ์`);
             const location = encodeURIComponent("Chulabhorn Hospital (อาคารกรมพระศรีสวางควัฒน)");
             window.open(`https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${EVENT_DATE}&details=${details}&location=${location}`, '_blank');
