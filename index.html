@@ -48,11 +48,6 @@
         .btn-outline:hover { border-color: #0ea5e9; color: #0ea5e9; transform: translateY(-3px); box-shadow: 0 10px 25px -5px rgba(14, 165, 233, 0.15); }
 
         .floating-btn { position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 50; }
-        
-        .countdown-box { display: flex; gap: 0.5rem; justify-content: center; margin-bottom: 1rem; }
-        .time-block { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 0.75rem; padding: 0.5rem; min-width: 3.5rem; text-align: center; box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.02); }
-        .time-val { font-size: 1.25rem; font-weight: 900; color: #1e3a8a; line-height: 1; }
-        .time-label { font-size: 0.65rem; color: #64748b; font-weight: 600; margin-top: 0.25rem; text-transform: uppercase; }
     </style>
 </head>
 <body class="bg-slate-50 min-h-screen text-slate-800 flex flex-col justify-center items-center relative p-4">
@@ -95,85 +90,25 @@
                 </div>
             </div>
 
-            <div id="countdown-wrapper" class="max-w-xl mx-auto">
-                <p class="text-sm font-bold text-cra-600 mb-2" id="countdown-title">ระบบเปิดให้ลงทะเบียนในอีก</p>
-                <div class="countdown-box" id="timer">
-                    <div class="time-block"><div class="time-val" id="days">00</div><div class="time-label">วัน</div></div>
-                    <div class="time-block"><div class="time-val" id="hours">00</div><div class="time-label">ชม.</div></div>
-                    <div class="time-block"><div class="time-val" id="mins">00</div><div class="time-label">นาที</div></div>
-                    <div class="time-block"><div class="time-val" id="secs">00</div><div class="time-label">วินาที</div></div>
-                </div>
-                <p id="system-notice" class="text-sm font-semibold text-rose-500 mt-4 mb-2 bg-rose-50 p-3 rounded-xl border border-rose-100 inline-block">
-                    * ระบบจะเปิดใช้งานในวันที่ 25 กันยายน 2569 เวลา 10:00 น. *
+            <div class="max-w-xl mx-auto mb-8">
+                <p class="text-base font-semibold text-rose-600 bg-rose-50 px-6 py-3 rounded-xl border border-rose-100 inline-flex items-center gap-2 shadow-sm">
+                    <i class="fi fi-sr-cross-circle"></i> ขณะนี้ระบบได้ปิดรับลงทะเบียนแล้ว
                 </p>
             </div>
 
             <div class="flex flex-col sm:flex-row gap-4 justify-center max-w-xl mx-auto">
-                <a href="register.html" id="btn-register" class="flex-1 btn-disabled py-4 font-black text-lg flex items-center justify-center gap-2 no-underline pointer-events-none">
-                    <i class="fi fi-sr-lock mt-0.5" id="reg-icon"></i> <span id="reg-text">รอก่อนนะ</span>
+                <!-- ปุ่มลงทะเบียนถูกปิดถาวร (Disabled) -->
+                <a href="#" class="flex-1 btn-disabled py-4 font-black text-lg flex items-center justify-center gap-2 no-underline pointer-events-none">
+                    <i class="fi fi-sr-lock mt-0.5"></i> <span>ปิดรับลงทะเบียน</span>
                 </a>
-                <a href="epass.html" id="btn-epass" class="flex-1 btn-disabled py-4 font-black text-lg flex items-center justify-center gap-2 no-underline pointer-events-none">
-                    <i class="fi fi-sr-lock mt-0.5" id="epass-icon"></i> <span id="epass-text">ระบบปิดอยู่</span>
+                
+                <!-- ปุ่ม E-PASS เปิดใช้งานสำหรับคนที่ลงทะเบียนแล้ว -->
+                <a href="epass.html" class="flex-1 btn-outline py-4 font-black text-lg flex items-center justify-center gap-2 no-underline cursor-pointer">
+                    <i class="fi fi-sr-id-badge mt-0.5"></i> <span>E-PASS เข้างาน</span>
                 </a>
             </div>
         </div>
     </div>
 
-    <script>
-        // Set the target date: September 25, 2026 at 10:00:00 (Month is 0-indexed, so 8 = September)
-        const targetDate = new Date(2026, 8, 25, 10, 0, 0).getTime();
-
-        function updateCountdown() {
-            const now = new Date().getTime();
-            const distance = targetDate - now;
-
-            const btnReg = document.getElementById('btn-register');
-            const regIcon = document.getElementById('reg-icon');
-            const regText = document.getElementById('reg-text');
-            
-            const btnEpass = document.getElementById('btn-epass');
-            const epassIcon = document.getElementById('epass-icon');
-            const epassText = document.getElementById('epass-text');
-            
-            const countdownWrapper = document.getElementById('countdown-wrapper');
-
-            if (distance < 0) {
-                // Time has reached - Open Registration
-                countdownWrapper.style.display = "none"; // Hide countdown
-                
-                // Enable buttons
-                btnReg.className = "flex-1 btn-primary py-4 font-black text-lg flex items-center justify-center gap-2 no-underline cursor-pointer";
-                btnReg.style.pointerEvents = "auto";
-                regIcon.className = "fi fi-sr-user-add mt-0.5";
-                regText.innerText = "ลงทะเบียน";
-                
-                btnEpass.className = "flex-1 btn-outline py-4 font-black text-lg flex items-center justify-center gap-2 no-underline cursor-pointer";
-                btnEpass.style.pointerEvents = "auto";
-                epassIcon.className = "fi fi-sr-id-badge mt-0.5";
-                epassText.innerText = "E-PASS เข้างาน";
-                
-                return; // Stop the function
-            }
-
-            // Calculations for days, hours, minutes and seconds
-            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
-            // Display the result
-            document.getElementById("days").innerText = days.toString().padStart(2, '0');
-            document.getElementById("hours").innerText = hours.toString().padStart(2, '0');
-            document.getElementById("mins").innerText = minutes.toString().padStart(2, '0');
-            document.getElementById("secs").innerText = seconds.toString().padStart(2, '0');
-        }
-
-        // Run immediately on load
-        updateCountdown();
-        
-        // Update every 1 second
-        setInterval(updateCountdown, 1000);
-
-    </script>
 </body>
 </html>
