@@ -128,7 +128,7 @@
     </div>
 
     <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxvCCFUo3KnDeUG4t0snFAi_dZBxJ40s6lOlVFDB80Dxh_QSwnFfW4qAknOeh2llK3SLw/exec"; 
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx792pTv4hvqt2tsQA3_Dv4sodtm1U67XOtTTvW5YpgoFIIuTxbNQFdQHGFlcd8HUBiIw/exec"; 
         let currentEpassData = null;
 
         function formatPhone(el) {
@@ -159,7 +159,8 @@
                     document.getElementById('ticketView').classList.add('flex');
                     
                     document.getElementById('epass-name').innerText = currentEpassData.name;
-                    document.getElementById('epass-grade').innerText = currentEpassData.school; // DB holds grade or school here depending on GS logic
+                    // แก้ไขจุดนี้ให้ตรงกับตัวแปรจาก GS
+                    document.getElementById('epass-grade').innerText = currentEpassData.grade; 
                     document.getElementById('epass-route').innerText = currentEpassData.route;
                     document.getElementById('epass-group').innerText = currentEpassData.group;
                     document.getElementById('epass-id').innerText = currentEpassData.id;
