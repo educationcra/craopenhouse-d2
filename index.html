@@ -92,14 +92,14 @@
 
             <div id="status-wrapper" class="max-w-xl mx-auto mb-8">
                 <p class="text-base font-semibold text-slate-600 bg-slate-50 px-6 py-3 rounded-xl border border-slate-200 inline-flex items-center gap-2 shadow-sm animate-pulse">
-                    <i class="fi fi-sr-spinner-third animate-spin"></i> กำลังตรวจสอบโควตารอบพิเศษ...
+                    <i class="fi fi-sr-spinner-third animate-spin"></i> กำลังตรวจสอบสถานะการลงทะเบียน...
                 </p>
             </div>
 
             <div class="flex flex-col sm:flex-row gap-4 justify-center max-w-xl mx-auto">
-                <!-- ปุ่มลงทะเบียนรอการอัปเดตสถานะจาก JavaScript -->
+                <!-- ปุ่มลงทะเบียนเริ่มต้นด้วยสถานะกำลังโหลด -->
                 <a href="#" id="btn-register" class="flex-1 btn-disabled py-4 font-black text-lg flex items-center justify-center gap-2 no-underline pointer-events-none transition-all">
-                    <i class="fi fi-sr-lock mt-0.5" id="reg-icon"></i> <span id="reg-text">ปิดรับลงทะเบียน</span>
+                    <i class="fi fi-sr-spinner-third animate-spin mt-0.5" id="reg-icon"></i> <span id="reg-text">รอสักครู่...</span>
                 </a>
                 
                 <!-- ปุ่ม E-PASS เปิดใช้งานสำหรับคนที่ลงทะเบียนแล้ว -->
@@ -136,7 +136,7 @@
 
                         statusWrapper.innerHTML = `
                             <p class="text-base font-semibold text-emerald-700 bg-emerald-50 px-6 py-3 rounded-xl border border-emerald-200 inline-flex items-center gap-2 shadow-sm">
-                                <i class="fi fi-sr-check-circle"></i> เปิดรับลงทะเบียนรอบพิเศษ (ว่าง ${MAX_VIP - data.vipCount} ที่นั่ง)
+                                <i class="fi fi-sr-check-circle"></i> เปิดรับลงทะเบียนรอบพิเศษ
                             </p>
                         `;
                     } else {
@@ -148,7 +148,7 @@
 
                         statusWrapper.innerHTML = `
                             <p class="text-base font-semibold text-rose-600 bg-rose-50 px-6 py-3 rounded-xl border border-rose-100 inline-flex items-center gap-2 shadow-sm">
-                                <i class="fi fi-sr-cross-circle"></i> โควตารอบพิเศษเต็มแล้ว (${MAX_VIP}/${MAX_VIP})
+                                <i class="fi fi-sr-cross-circle"></i> โควตารอบพิเศษเต็มแล้ว
                             </p>
                         `;
                     }
@@ -156,9 +156,14 @@
             } catch (error) {
                 console.error("Error fetching quota:", error);
                 // หากการดึงข้อมูลผิดพลาด ให้ปิดระบบไว้ก่อนเพื่อความปลอดภัย
+                btnReg.className = "flex-1 btn-disabled py-4 font-black text-lg flex items-center justify-center gap-2 no-underline pointer-events-none";
+                regIcon.className = "fi fi-sr-cross-circle mt-0.5";
+                regIcon.classList.remove("animate-spin");
+                regText.innerText = "ระบบขัดข้อง";
+
                 statusWrapper.innerHTML = `
                     <p class="text-base font-semibold text-rose-600 bg-rose-50 px-6 py-3 rounded-xl border border-rose-100 inline-flex items-center gap-2 shadow-sm">
-                        <i class="fi fi-sr-cross-circle"></i> ขณะนี้ระบบได้ปิดรับลงทะเบียนแล้ว
+                        <i class="fi fi-sr-cross-circle"></i> ขณะนี้ระบบได้ปิดรับลงทะเบียนแล้ว หรือมีปัญหาการเชื่อมต่อ
                     </p>
                 `;
             }
