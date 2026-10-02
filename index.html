@@ -90,16 +90,16 @@
                 </div>
             </div>
 
-            <div class="max-w-xl mx-auto mb-8">
-                <p class="text-base font-semibold text-rose-600 bg-rose-50 px-6 py-3 rounded-xl border border-rose-100 inline-flex items-center gap-2 shadow-sm">
-                    <i class="fi fi-sr-cross-circle"></i> ขณะนี้ระบบได้ปิดรับลงทะเบียนแล้ว
+            <div id="status-wrapper" class="max-w-xl mx-auto mb-8">
+                <p class="text-base font-semibold text-slate-600 bg-slate-50 px-6 py-3 rounded-xl border border-slate-200 inline-flex items-center gap-2 shadow-sm animate-pulse">
+                    <i class="fi fi-sr-spinner-third animate-spin"></i> กำลังตรวจสอบโควตารอบพิเศษ...
                 </p>
             </div>
 
             <div class="flex flex-col sm:flex-row gap-4 justify-center max-w-xl mx-auto">
-                <!-- ปุ่มลงทะเบียนถูกปิดถาวร (Disabled) -->
-                <a href="#" class="flex-1 btn-disabled py-4 font-black text-lg flex items-center justify-center gap-2 no-underline pointer-events-none">
-                    <i class="fi fi-sr-lock mt-0.5"></i> <span>ปิดรับลงทะเบียน</span>
+                <!-- ปุ่มลงทะเบียนรอการอัปเดตสถานะจาก JavaScript -->
+                <a href="#" id="btn-register" class="flex-1 btn-disabled py-4 font-black text-lg flex items-center justify-center gap-2 no-underline pointer-events-none transition-all">
+                    <i class="fi fi-sr-lock mt-0.5" id="reg-icon"></i> <span id="reg-text">ปิดรับลงทะเบียน</span>
                 </a>
                 
                 <!-- ปุ่ม E-PASS เปิดใช้งานสำหรับคนที่ลงทะเบียนแล้ว -->
@@ -110,5 +110,62 @@
         </div>
     </div>
 
+    <script>
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxvCCFUo3KnDeUG4t0snFAi_dZBxJ40s6lOlVFDB80Dxh_QSwnFfW4qAknOeh2llK3SLw/exec";
+        const MAX_VIP = 108; // จำนวนโควตา VIP สูงสุด
+
+        async function checkVIPQuota() {
+            const btnReg = document.getElementById('btn-register');
+            const regIcon = document.getElementById('reg-icon');
+            const regText = document.getElementById('reg-text');
+            const statusWrapper = document.getElementById('status-wrapper');
+
+            try {
+                // ดึงข้อมูลสถิติจาก Backend
+                const response = await fetch(SCRIPT_URL + "?action=getDashboardStats");
+                const data = await response.json();
+
+                if (data.status === 'success') {
+                    if (data.vipCount < MAX_VIP) {
+                        // กรณียังไม่เต็ม -> เปิดปุ่มลงทะเบียน VIP
+                        btnReg.href = "vipreg.html";
+                        btnReg.className = "flex-1 btn-primary py-4 font-black text-lg flex items-center justify-center gap-2 no-underline cursor-pointer";
+                        btnReg.style.pointerEvents = "auto";
+                        regIcon.className = "fi fi-sr-crown mt-0.5 text-gold-400";
+                        regText.innerText = "ลงทะเบียนรอบพิเศษ";
+
+                        statusWrapper.innerHTML = `
+                            <p class="text-base font-semibold text-emerald-700 bg-emerald-50 px-6 py-3 rounded-xl border border-emerald-200 inline-flex items-center gap-2 shadow-sm">
+                                <i class="fi fi-sr-check-circle"></i> เปิดรับลงทะเบียนรอบพิเศษ (ว่าง ${MAX_VIP - data.vipCount} ที่นั่ง)
+                            </p>
+                        `;
+                    } else {
+                        // กรณีเต็มแล้ว -> ปิดปุ่ม
+                        btnReg.href = "#";
+                        btnReg.className = "flex-1 btn-disabled py-4 font-black text-lg flex items-center justify-center gap-2 no-underline pointer-events-none";
+                        regIcon.className = "fi fi-sr-lock mt-0.5";
+                        regText.innerText = "ปิดรับลงทะเบียน";
+
+                        statusWrapper.innerHTML = `
+                            <p class="text-base font-semibold text-rose-600 bg-rose-50 px-6 py-3 rounded-xl border border-rose-100 inline-flex items-center gap-2 shadow-sm">
+                                <i class="fi fi-sr-cross-circle"></i> โควตารอบพิเศษเต็มแล้ว (${MAX_VIP}/${MAX_VIP})
+                            </p>
+                        `;
+                    }
+                }
+            } catch (error) {
+                console.error("Error fetching quota:", error);
+                // หากการดึงข้อมูลผิดพลาด ให้ปิดระบบไว้ก่อนเพื่อความปลอดภัย
+                statusWrapper.innerHTML = `
+                    <p class="text-base font-semibold text-rose-600 bg-rose-50 px-6 py-3 rounded-xl border border-rose-100 inline-flex items-center gap-2 shadow-sm">
+                        <i class="fi fi-sr-cross-circle"></i> ขณะนี้ระบบได้ปิดรับลงทะเบียนแล้ว
+                    </p>
+                `;
+            }
+        }
+
+        // รันฟังก์ชันทันทีที่โหลดหน้าเว็บเสร็จ
+        window.onload = checkVIPQuota;
+    </script>
 </body>
 </html>
