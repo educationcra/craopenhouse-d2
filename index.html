@@ -49,10 +49,10 @@
 
         .floating-btn { position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 50; }
         
-        .countdown-box { display: flex; gap: 0.5rem; justify-content: center; margin-bottom: 1rem; }
-        .time-block { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 0.75rem; padding: 0.5rem; min-width: 3.5rem; text-align: center; box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.02); }
-        .time-val { font-size: 1.25rem; font-weight: 900; color: #1e3a8a; line-height: 1; }
-        .time-label { font-size: 0.65rem; color: #64748b; font-weight: 600; margin-top: 0.25rem; text-transform: uppercase; }
+        /* สไตล์สำหรับกล่อง Countdown */
+        .countdown-box { display: inline-flex; flex-direction: column; align-items: center; justify-content: center; background: white; border: 2px solid #e2e8f0; border-radius: 0.75rem; min-width: 4rem; padding: 0.5rem; margin: 0 0.25rem; }
+        .countdown-value { font-size: 1.5rem; font-weight: 900; color: #1e3a8a; line-height: 1; margin-bottom: 0.25rem;}
+        .countdown-label { font-size: 0.7rem; font-weight: 600; color: #64748b; text-transform: uppercase; }
     </style>
 </head>
 <body class="bg-slate-50 min-h-screen text-slate-800 flex flex-col justify-center items-center relative p-4">
@@ -73,7 +73,7 @@
         
         <div class="p-8 md:p-14 text-center">
             <!-- Hidden VIP Trigger Area -->
-            <a href="vipreg.html" class="absolute top-0 right-0 w-16 h-16 opacity-0 z-50"></a>
+            <a href="register.html?type=vip" class="absolute top-0 right-0 w-16 h-16 opacity-0 z-50"></a>
 
             <div class="w-24 h-24 md:w-32 md:h-32 mx-auto mb-6 bg-cra-50 rounded-full flex items-center justify-center border-4 border-white shadow-lg">
                 <i class="fi fi-sr-pulse text-5xl md:text-6xl text-cra-500 mt-2"></i>
@@ -95,85 +95,182 @@
                 </div>
             </div>
 
-            <div id="countdown-wrapper" class="max-w-xl mx-auto">
-                <p class="text-sm font-bold text-cra-600 mb-2" id="countdown-title">ระบบเปิดให้ลงทะเบียนในอีก</p>
-                <div class="countdown-box" id="timer">
-                    <div class="time-block"><div class="time-val" id="days">00</div><div class="time-label">วัน</div></div>
-                    <div class="time-block"><div class="time-val" id="hours">00</div><div class="time-label">ชม.</div></div>
-                    <div class="time-block"><div class="time-val" id="mins">00</div><div class="time-label">นาที</div></div>
-                    <div class="time-block"><div class="time-val" id="secs">00</div><div class="time-label">วินาที</div></div>
-                </div>
-                <p id="system-notice" class="text-sm font-semibold text-rose-500 mt-4 mb-2 bg-rose-50 p-3 rounded-xl border border-rose-100 inline-block">
-                    * ระบบจะเปิดใช้งานในวันที่ 25 กันยายน 2569 เวลา 10:00 น. *
+            <!-- กล่องสำหรับแสดงสถานะ / Countdown -->
+            <div id="status-wrapper" class="max-w-xl mx-auto mb-8 min-h-[5rem] flex flex-col items-center justify-center">
+                <!-- เนื้อหาจะถูกเติมด้วย JavaScript -->
+                <p class="text-base font-semibold text-slate-600 bg-slate-50 px-6 py-3 rounded-xl border border-slate-200 inline-flex items-center gap-2 shadow-sm animate-pulse">
+                    <i class="fi fi-sr-spinner-third animate-spin"></i> กำลังเตรียมระบบ...
                 </p>
             </div>
 
             <div class="flex flex-col sm:flex-row gap-4 justify-center max-w-xl mx-auto">
-                <a href="register.html" id="btn-register" class="flex-1 btn-disabled py-4 font-black text-lg flex items-center justify-center gap-2 no-underline pointer-events-none">
-                    <i class="fi fi-sr-lock mt-0.5" id="reg-icon"></i> <span id="reg-text">รอก่อนนะ</span>
+                <!-- ปุ่มลงทะเบียนเริ่มต้น -->
+                <a href="#" id="btn-register" class="flex-1 btn-disabled py-4 font-black text-lg flex items-center justify-center gap-2 no-underline pointer-events-none transition-all">
+                    <i class="fi fi-sr-lock mt-0.5" id="reg-icon"></i> <span id="reg-text">รอก่อนนะ...</span>
                 </a>
-                <a href="epass.html" id="btn-epass" class="flex-1 btn-disabled py-4 font-black text-lg flex items-center justify-center gap-2 no-underline pointer-events-none">
-                    <i class="fi fi-sr-lock mt-0.5" id="epass-icon"></i> <span id="epass-text">ระบบปิดอยู่</span>
+                
+                <!-- ปุ่ม E-PASS -->
+                <a href="epass.html" class="flex-1 btn-outline py-4 font-black text-lg flex items-center justify-center gap-2 no-underline cursor-pointer">
+                    <i class="fi fi-sr-id-badge mt-0.5"></i> <span>E-PASS เข้างาน</span>
                 </a>
             </div>
         </div>
     </div>
 
     <script>
-        // Set the target date: September 25, 2026 at 10:00:00 (Month is 0-indexed, so 8 = September)
-        const targetDate = new Date(2026, 8, 25, 10, 0, 0).getTime();
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxvCCFUo3KnDeUG4t0snFAi_dZBxJ40s6lOlVFDB80Dxh_QSwnFfW4qAknOeh2llK3SLw/exec";
+        const MAX_NORMAL = 216; // จำนวนโควตาปกติสูงสุด
+        const MAX_VIP = 108; // จำนวนโควตา VIP สูงสุด
 
-        function updateCountdown() {
-            const now = new Date().getTime();
-            const distance = targetDate - now;
+        // กำหนดเวลาเปิดลงทะเบียน (10:00 น. ของวันปัจจุบันตามเครื่องผู้ใช้)
+        const getOpeningTime = () => {
+            const now = new Date();
+            const openingTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 10, 0, 0);
+            return openingTime.getTime();
+        };
 
+        const targetTime = getOpeningTime();
+        let countdownInterval;
+
+        // ฟังก์ชันสร้าง UI สำหรับ Countdown
+        function updateCountdownDisplay(timeRemaining) {
+            const statusWrapper = document.getElementById('status-wrapper');
+            
+            const hours = Math.floor((timeRemaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((timeRemaining % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((timeRemaining % (1000 * 60)) / 1000);
+
+            statusWrapper.innerHTML = `
+                <p class="text-sm font-bold text-cra-600 mb-2">ระบบจะเปิดในอีก</p>
+                <div class="flex justify-center items-center">
+                    <div class="countdown-box">
+                        <span class="countdown-value">${hours.toString().padStart(2, '0')}</span>
+                        <span class="countdown-label">ชม.</span>
+                    </div>
+                    <span class="text-2xl font-black text-slate-300 pb-4">:</span>
+                    <div class="countdown-box">
+                        <span class="countdown-value">${minutes.toString().padStart(2, '0')}</span>
+                        <span class="countdown-label">นาที</span>
+                    </div>
+                    <span class="text-2xl font-black text-slate-300 pb-4">:</span>
+                    <div class="countdown-box">
+                        <span class="countdown-value">${seconds.toString().padStart(2, '0')}</span>
+                        <span class="countdown-label">วิ.</span>
+                    </div>
+                </div>
+            `;
+        }
+
+        // ฟังก์ชันเริ่มนับถอยหลัง
+        function startCountdown() {
+            countdownInterval = setInterval(() => {
+                const now = new Date().getTime();
+                const timeRemaining = targetTime - now;
+
+                if (timeRemaining > 0) {
+                    // ยังไม่ถึงเวลา
+                    updateCountdownDisplay(timeRemaining);
+                } else {
+                    // ถึงเวลาแล้ว!
+                    clearInterval(countdownInterval);
+                    initRegistration();
+                }
+            }, 1000);
+        }
+
+        // ฟังก์ชันตรวจสอบและดึงโควตา
+        async function checkQuota() {
             const btnReg = document.getElementById('btn-register');
             const regIcon = document.getElementById('reg-icon');
             const regText = document.getElementById('reg-text');
-            
-            const btnEpass = document.getElementById('btn-epass');
-            const epassIcon = document.getElementById('epass-icon');
-            const epassText = document.getElementById('epass-text');
-            
-            const countdownWrapper = document.getElementById('countdown-wrapper');
+            const statusWrapper = document.getElementById('status-wrapper');
 
-            if (distance < 0) {
-                // Time has reached - Open Registration
-                countdownWrapper.style.display = "none"; // Hide countdown
+            try {
+                // อัปเดต UI ว่ากำลังเช็คข้อมูล
+                btnReg.className = "flex-1 btn-disabled py-4 font-black text-lg flex items-center justify-center gap-2 no-underline pointer-events-none transition-all";
+                regIcon.className = "fi fi-sr-spinner-third animate-spin mt-0.5";
+                regText.innerText = "กำลังเชื่อมต่อระบบ...";
                 
-                // Enable buttons
-                btnReg.className = "flex-1 btn-primary py-4 font-black text-lg flex items-center justify-center gap-2 no-underline cursor-pointer";
-                btnReg.style.pointerEvents = "auto";
-                regIcon.className = "fi fi-sr-user-add mt-0.5";
-                regText.innerText = "ลงทะเบียน";
-                
-                btnEpass.className = "flex-1 btn-outline py-4 font-black text-lg flex items-center justify-center gap-2 no-underline cursor-pointer";
-                btnEpass.style.pointerEvents = "auto";
-                epassIcon.className = "fi fi-sr-id-badge mt-0.5";
-                epassText.innerText = "E-PASS เข้างาน";
-                
-                return; // Stop the function
+                statusWrapper.innerHTML = `
+                    <p class="text-base font-semibold text-slate-600 bg-slate-50 px-6 py-3 rounded-xl border border-slate-200 inline-flex items-center gap-2 shadow-sm animate-pulse">
+                        <i class="fi fi-sr-spinner-third animate-spin"></i> ตรวจสอบโควตา...
+                    </p>
+                `;
+
+                // ดึงข้อมูลสถิติจาก Backend
+                const response = await fetch(SCRIPT_URL + "?action=getDashboardStats");
+                const data = await response.json();
+
+                if (data.status === 'success') {
+                    const isNormalFull = data.normalCount >= MAX_NORMAL;
+                    const isVipFull = data.vipCount >= MAX_VIP;
+
+                    if (!isNormalFull || !isVipFull) {
+                        // กรณียังมีโควตาเหลือ (ทั่วไป หรือ VIP)
+                        btnReg.href = "register.html";
+                        btnReg.className = "flex-1 btn-primary py-4 font-black text-lg flex items-center justify-center gap-2 no-underline cursor-pointer";
+                        btnReg.style.pointerEvents = "auto";
+                        regIcon.className = "fi fi-sr-document-signed mt-0.5";
+                        regText.innerText = "ลงทะเบียนเข้าร่วมงาน";
+
+                        let statusText = "เปิดรับลงทะเบียนแล้ว";
+                        if (isNormalFull) statusText = "เปิดรับลงทะเบียน";
+                        else if (isVipFull) statusText = "เปิดรับลงทะเบียน";
+
+                        statusWrapper.innerHTML = `
+                            <p class="text-base font-semibold text-emerald-700 bg-emerald-50 px-6 py-3 rounded-xl border border-emerald-200 inline-flex items-center gap-2 shadow-sm">
+                                <i class="fi fi-sr-check-circle"></i> ${statusText}
+                            </p>
+                        `;
+                    } else {
+                        // กรณีเต็มทุกโควตาแล้ว
+                        btnReg.href = "#";
+                        btnReg.className = "flex-1 btn-disabled py-4 font-black text-lg flex items-center justify-center gap-2 no-underline pointer-events-none";
+                        regIcon.className = "fi fi-sr-cross-circle mt-0.5 text-rose-500";
+                        regText.innerText = "โควตาเต็มแล้ว";
+
+                        statusWrapper.innerHTML = `
+                            <p class="text-base font-semibold text-rose-600 bg-rose-50 px-6 py-3 rounded-xl border border-rose-100 inline-flex items-center gap-2 shadow-sm">
+                                <i class="fi fi-sr-cross-circle"></i> โควตาทุกรอบเต็มแล้ว
+                            </p>
+                        `;
+                    }
+                } else {
+                     throw new Error("Invalid response format");
+                }
+            } catch (error) {
+                console.error("Error fetching quota:", error);
+                // หากการดึงข้อมูลผิดพลาด
+                btnReg.className = "flex-1 btn-disabled py-4 font-black text-lg flex items-center justify-center gap-2 no-underline pointer-events-none";
+                regIcon.className = "fi fi-sr-exclamation mt-0.5 text-orange-500";
+                regIcon.classList.remove("animate-spin");
+                regText.innerText = "ระบบขัดข้อง";
+
+                statusWrapper.innerHTML = `
+                    <p class="text-base font-semibold text-orange-600 bg-orange-50 px-6 py-3 rounded-xl border border-orange-200 inline-flex items-center gap-2 shadow-sm">
+                        <i class="fi fi-sr-triangle-warning"></i> ไม่สามารถเชื่อมต่อฐานข้อมูลได้
+                    </p>
+                `;
             }
-
-            // Calculations for days, hours, minutes and seconds
-            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
-            // Display the result
-            document.getElementById("days").innerText = days.toString().padStart(2, '0');
-            document.getElementById("hours").innerText = hours.toString().padStart(2, '0');
-            document.getElementById("mins").innerText = minutes.toString().padStart(2, '0');
-            document.getElementById("secs").innerText = seconds.toString().padStart(2, '0');
         }
 
-        // Run immediately on load
-        updateCountdown();
-        
-        // Update every 1 second
-        setInterval(updateCountdown, 1000);
+        // ฟังก์ชันจัดการจังหวะเริ่มต้น
+        function initRegistration() {
+            const now = new Date().getTime();
+            if (now >= targetTime) {
+                // ถ้าเลยเวลา 10 โมงแล้ว ให้เช็คโควตาทันที
+                checkQuota();
+            } else {
+                // ถ้ายังไม่ถึง 10 โมง ให้เริ่มนับถอยหลัง
+                startCountdown();
+                
+                // อัปเดต UI แรกสุดทันทีก่อน setInterval ทำงาน
+                updateCountdownDisplay(targetTime - now); 
+            }
+        }
 
+        // รันฟังก์ชันทันทีที่โหลดหน้าเว็บเสร็จ
+        window.onload = initRegistration;
     </script>
 </body>
 </html>
