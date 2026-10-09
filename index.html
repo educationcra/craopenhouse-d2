@@ -8,7 +8,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <link rel='stylesheet' href='https://cdn-uicons.flaticon.com/2.1.0/uicons-solid-rounded/css/uicons-solid-rounded.css'>
+    <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/2.1.0/uicons-solid-rounded/css/uicons-solid-rounded.css">
 
     <script>
         tailwind.config = {
@@ -21,45 +21,30 @@
                     }
                 }
             }
-        }
+        };
     </script>
 
     <style>
-        body { font-family: 'Noto Sans Thai', sans-serif; -webkit-tap-highlight-color: transparent; background-color: #f8fafc; overflow-x: hidden;}
-        
-        .main-container { background: #ffffff; border-radius: 2.5rem; box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.05); border: 1px solid #f1f5f9; position: relative; z-index: 1; overflow: hidden;}
-        
-        /* Floating Background Icons */
+        body { font-family: 'Noto Sans Thai', sans-serif; -webkit-tap-highlight-color: transparent; background-color: #f8fafc; overflow-x: hidden; }
+        .main-container { background: #ffffff; border-radius: 2.5rem; box-shadow: 0 25px 50px -12px rgba(15,23,42,0.05); border: 1px solid #f1f5f9; position: relative; z-index: 1; overflow: hidden; }
         .floating-bg { position: fixed; inset: 0; overflow: hidden; pointer-events: none; z-index: -40; }
-        .float-icon { position: absolute; bottom: -10%; opacity: 0; color: rgba(30, 58, 138, 0.04); animation: floatUp linear infinite; }
-        @keyframes floatUp {
-            0% { transform: translateY(10vh) rotate(0deg) scale(0.8); opacity: 0; }
-            10% { opacity: 1; }
-            90% { opacity: 1; }
-            100% { transform: translateY(-110vh) rotate(360deg) scale(1.5); opacity: 0; }
-        }
-
-        .btn-primary { background: linear-gradient(135deg, #1e3a8a 0%, #0369a1 100%); color: white; transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1); box-shadow: 0 10px 25px -5px rgba(30, 58, 138, 0.4); border-radius: 1.25rem;}
-        .btn-primary:not(:disabled):hover { transform: translateY(-3px); box-shadow: 0 15px 35px -5px rgba(30, 58, 138, 0.5); background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%); }
-
+        .float-icon { position: absolute; bottom: -10%; opacity: 0; color: rgba(30,58,138,0.04); animation: floatUp linear infinite; }
+        @keyframes floatUp { 0% { transform: translateY(10vh) rotate(0deg) scale(0.8); opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { transform: translateY(-110vh) rotate(360deg) scale(1.5); opacity: 0; } }
+        .btn-primary { background: linear-gradient(135deg,#1e3a8a 0%,#0369a1 100%); color: white; transition: all 0.3s cubic-bezier(0.2,0.8,0.2,1); box-shadow: 0 10px 25px -5px rgba(30,58,138,0.4); border-radius: 1.25rem; }
+        .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 15px 35px -5px rgba(30,58,138,0.5); background: linear-gradient(135deg,#0ea5e9 0%,#0284c7 100%); }
         .btn-disabled { background: #e2e8f0; color: #94a3b8; cursor: not-allowed; border-radius: 1.25rem; box-shadow: none; border: 1px solid #cbd5e1; }
-        
-        .btn-outline { background: white; color: #0369a1; border: 2px solid #e0f2fe; transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1); border-radius: 1.25rem;}
-        .btn-outline:hover { border-color: #0ea5e9; color: #0ea5e9; transform: translateY(-3px); box-shadow: 0 10px 25px -5px rgba(14, 165, 233, 0.15); }
-
+        .btn-outline { background: white; color: #0369a1; border: 2px solid #e0f2fe; transition: all 0.3s cubic-bezier(0.2,0.8,0.2,1); border-radius: 1.25rem; }
+        .btn-outline:hover { border-color: #0ea5e9; color: #0ea5e9; transform: translateY(-3px); box-shadow: 0 10px 25px -5px rgba(14,165,233,0.15); }
         .floating-btn { position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 50; }
-        
-        /* สไตล์สำหรับกล่อง Countdown */
         .countdown-box { display: inline-flex; flex-direction: column; align-items: center; justify-content: center; background: white; border: 2px solid #e2e8f0; border-radius: 0.75rem; min-width: 4rem; padding: 0.5rem; margin: 0 0.25rem; }
-        .countdown-value { font-size: 1.5rem; font-weight: 900; color: #1e3a8a; line-height: 1; margin-bottom: 0.25rem;}
+        .countdown-value { font-size: 1.5rem; font-weight: 900; color: #1e3a8a; line-height: 1; margin-bottom: 0.25rem; }
         .countdown-label { font-size: 0.7rem; font-weight: 600; color: #64748b; text-transform: uppercase; }
     </style>
 </head>
 <body class="bg-slate-50 min-h-screen text-slate-800 flex flex-col justify-center items-center relative p-4">
-
     <div class="fixed top-[-10%] left-[-10%] w-[50%] h-[50%] bg-cra-400 rounded-full mix-blend-multiply filter blur-[120px] opacity-10 pointer-events-none z-[-1]"></div>
     <div class="fixed bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-mint-400 rounded-full mix-blend-multiply filter blur-[120px] opacity-10 pointer-events-none z-[-1]"></div>
-    
+
     <div class="floating-bg">
         <i class="fi fi-sr-stethoscope float-icon" style="left: 10%; font-size: 4rem; animation-duration: 25s; animation-delay: 0s;"></i>
         <i class="fi fi-sr-microscope float-icon" style="left: 80%; font-size: 5rem; animation-duration: 22s; animation-delay: 5s;"></i>
@@ -70,15 +55,11 @@
 
     <div class="w-full max-w-4xl main-container">
         <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-cra-900 via-cra-500 to-mint-400"></div>
-        
         <div class="p-8 md:p-14 text-center">
-            <!-- Hidden VIP Trigger Area -->
-            <a href="register.html?type=vip" class="absolute top-0 right-0 w-16 h-16 opacity-0 z-50"></a>
-
+            <!-- ลบลิงก์ VIP ที่ซ่อนอยู่ออกแล้ว -->
             <div class="w-24 h-24 md:w-32 md:h-32 mx-auto mb-6 bg-cra-50 rounded-full flex items-center justify-center border-4 border-white shadow-lg">
                 <i class="fi fi-sr-pulse text-5xl md:text-6xl text-cra-500 mt-2"></i>
             </div>
-
             <h1 class="text-3xl md:text-5xl font-black text-cra-900 mb-3 tracking-tight">CRA OPENHOUSE 2027</h1>
             <h2 class="text-lg md:text-2xl font-bold text-slate-500 mb-10">กิจกรรมฐานการเรียนรู้ทางการแพทย์ โรงพยาบาลจุฬาภรณ์</h2>
 
@@ -95,21 +76,16 @@
                 </div>
             </div>
 
-            <!-- กล่องสำหรับแสดงสถานะ / Countdown -->
-            <div id="status-wrapper" class="max-w-xl mx-auto mb-8 min-h-[5rem] flex flex-col items-center justify-center">
-                <!-- เนื้อหาจะถูกเติมด้วย JavaScript -->
+            <div id="status-wrapper" class="max-w-xl mx-auto mb-8 min-h-[5rem] flex flex-col items-center justify-center" role="status" aria-live="polite">
                 <p class="text-base font-semibold text-slate-600 bg-slate-50 px-6 py-3 rounded-xl border border-slate-200 inline-flex items-center gap-2 shadow-sm animate-pulse">
                     <i class="fi fi-sr-spinner-third animate-spin"></i> กำลังเตรียมระบบ...
                 </p>
             </div>
 
             <div class="flex flex-col sm:flex-row gap-4 justify-center max-w-xl mx-auto">
-                <!-- ปุ่มลงทะเบียนเริ่มต้น -->
-                <a href="#" id="btn-register" class="flex-1 btn-disabled py-4 font-black text-lg flex items-center justify-center gap-2 no-underline pointer-events-none transition-all">
+                <a href="#" id="btn-register" aria-disabled="true" tabindex="-1" class="flex-1 btn-disabled py-4 font-black text-lg flex items-center justify-center gap-2 no-underline pointer-events-none transition-all">
                     <i class="fi fi-sr-lock mt-0.5" id="reg-icon"></i> <span id="reg-text">รอก่อนนะ...</span>
                 </a>
-                
-                <!-- ปุ่ม E-PASS -->
                 <a href="epass.html" class="flex-1 btn-outline py-4 font-black text-lg flex items-center justify-center gap-2 no-underline cursor-pointer">
                     <i class="fi fi-sr-id-badge mt-0.5"></i> <span>E-PASS เข้างาน</span>
                 </a>
@@ -119,158 +95,126 @@
 
     <script>
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxvCCFUo3KnDeUG4t0snFAi_dZBxJ40s6lOlVFDB80Dxh_QSwnFfW4qAknOeh2llK3SLw/exec";
-        const MAX_NORMAL = 216; // จำนวนโควตาปกติสูงสุด
-        const MAX_VIP = 108; // จำนวนโควตา VIP สูงสุด
+        const MAX_SEAT_PER_GROUP = 27;
+        const TOTAL_GROUPS = 12;
+        const REFRESH_INTERVAL_MS = 60000;
+        // 25 กันยายน 2569 เวลา 10:00 น. ประเทศไทย (แทนเวลา 10 โมงของทุกวัน)
+        const targetTime = Date.parse('2026-09-25T10:00:00+07:00');
+        let countdownInterval = null;
+        let quotaChecking = false;
 
-        // กำหนดเวลาเปิดลงทะเบียน (10:00 น. ของวันปัจจุบันตามเครื่องผู้ใช้)
-        const getOpeningTime = () => {
-            const now = new Date();
-            const openingTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 10, 0, 0);
-            return openingTime.getTime();
-        };
+        function setRegistrationButton(enabled, label, iconName) {
+            const button = document.getElementById('btn-register');
+            document.getElementById('reg-icon').className = 'fi ' + iconName + ' mt-0.5';
+            document.getElementById('reg-text').textContent = label;
+            button.href = enabled ? 'register.html' : '#';
+            button.className = 'flex-1 ' + (enabled ? 'btn-primary' : 'btn-disabled') +
+                ' py-4 font-black text-lg flex items-center justify-center gap-2 no-underline transition-all ' +
+                (enabled ? 'cursor-pointer' : 'pointer-events-none');
+            button.style.pointerEvents = enabled ? 'auto' : 'none';
+            button.setAttribute('aria-disabled', String(!enabled));
+            button.tabIndex = enabled ? 0 : -1;
+        }
 
-        const targetTime = getOpeningTime();
-        let countdownInterval;
+        function setStatus(message, mode) {
+            const configs = {
+                success: { classes: 'text-emerald-700 bg-emerald-50 border-emerald-200', icon: 'fi-sr-check-circle' },
+                full: { classes: 'text-rose-600 bg-rose-50 border-rose-200', icon: 'fi-sr-cross-circle' },
+                error: { classes: 'text-orange-600 bg-orange-50 border-orange-200', icon: 'fi-sr-triangle-warning' },
+                loading: { classes: 'text-slate-600 bg-slate-50 border-slate-200', icon: 'fi-sr-spinner-third animate-spin' }
+            };
+            const config = configs[mode] || configs.loading;
+            const wrapper = document.getElementById('status-wrapper');
+            wrapper.innerHTML = '';
+            const p = document.createElement('p');
+            p.className = 'text-base font-semibold px-6 py-3 rounded-xl border inline-flex items-center gap-2 shadow-sm ' + config.classes;
+            const i = document.createElement('i');
+            i.className = 'fi ' + config.icon;
+            p.appendChild(i);
+            p.appendChild(document.createTextNode(' ' + message));
+            wrapper.appendChild(p);
+        }
 
-        // ฟังก์ชันสร้าง UI สำหรับ Countdown
         function updateCountdownDisplay(timeRemaining) {
-            const statusWrapper = document.getElementById('status-wrapper');
-            
-            const hours = Math.floor((timeRemaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const hours = Math.floor(timeRemaining / (1000 * 60 * 60));
             const minutes = Math.floor((timeRemaining % (1000 * 60 * 60)) / (1000 * 60));
             const seconds = Math.floor((timeRemaining % (1000 * 60)) / 1000);
-
-            statusWrapper.innerHTML = `
+            document.getElementById('status-wrapper').innerHTML = `
                 <p class="text-sm font-bold text-cra-600 mb-2">ระบบจะเปิดในอีก</p>
                 <div class="flex justify-center items-center">
-                    <div class="countdown-box">
-                        <span class="countdown-value">${hours.toString().padStart(2, '0')}</span>
-                        <span class="countdown-label">ชม.</span>
-                    </div>
+                    <div class="countdown-box"><span class="countdown-value">${String(hours).padStart(2,'0')}</span><span class="countdown-label">ชม.</span></div>
                     <span class="text-2xl font-black text-slate-300 pb-4">:</span>
-                    <div class="countdown-box">
-                        <span class="countdown-value">${minutes.toString().padStart(2, '0')}</span>
-                        <span class="countdown-label">นาที</span>
-                    </div>
+                    <div class="countdown-box"><span class="countdown-value">${String(minutes).padStart(2,'0')}</span><span class="countdown-label">นาที</span></div>
                     <span class="text-2xl font-black text-slate-300 pb-4">:</span>
-                    <div class="countdown-box">
-                        <span class="countdown-value">${seconds.toString().padStart(2, '0')}</span>
-                        <span class="countdown-label">วิ.</span>
-                    </div>
-                </div>
-            `;
+                    <div class="countdown-box"><span class="countdown-value">${String(seconds).padStart(2,'0')}</span><span class="countdown-label">วิ.</span></div>
+                </div>`;
         }
 
-        // ฟังก์ชันเริ่มนับถอยหลัง
-        function startCountdown() {
-            countdownInterval = setInterval(() => {
-                const now = new Date().getTime();
-                const timeRemaining = targetTime - now;
-
-                if (timeRemaining > 0) {
-                    // ยังไม่ถึงเวลา
-                    updateCountdownDisplay(timeRemaining);
-                } else {
-                    // ถึงเวลาแล้ว!
-                    clearInterval(countdownInterval);
-                    initRegistration();
-                }
-            }, 1000);
-        }
-
-        // ฟังก์ชันตรวจสอบและดึงโควตา
         async function checkQuota() {
-            const btnReg = document.getElementById('btn-register');
-            const regIcon = document.getElementById('reg-icon');
-            const regText = document.getElementById('reg-text');
-            const statusWrapper = document.getElementById('status-wrapper');
-
+            if (quotaChecking) return;
+            quotaChecking = true;
+            // ระหว่างตรวจใหม่ ปิดปุ่มชั่วคราวเพื่อไม่ให้สถานะเก่าพาเข้าสมัคร
+            setRegistrationButton(false, 'กำลังตรวจสอบที่นั่ง...', 'fi-sr-spinner-third animate-spin');
+            setStatus('กำลังตรวจสอบโควต้าจากฐานข้อมูล...', 'loading');
             try {
-                // อัปเดต UI ว่ากำลังเช็คข้อมูล
-                btnReg.className = "flex-1 btn-disabled py-4 font-black text-lg flex items-center justify-center gap-2 no-underline pointer-events-none transition-all";
-                regIcon.className = "fi fi-sr-spinner-third animate-spin mt-0.5";
-                regText.innerText = "กำลังเชื่อมต่อระบบ...";
-                
-                statusWrapper.innerHTML = `
-                    <p class="text-base font-semibold text-slate-600 bg-slate-50 px-6 py-3 rounded-xl border border-slate-200 inline-flex items-center gap-2 shadow-sm animate-pulse">
-                        <i class="fi fi-sr-spinner-third animate-spin"></i> ตรวจสอบโควตา...
-                    </p>
-                `;
-
-                // ดึงข้อมูลสถิติจาก Backend
-                const response = await fetch(SCRIPT_URL + "?action=getDashboardStats");
+                const response = await fetch(SCRIPT_URL + '?action=getQuotas&t=' + Date.now(), { cache: 'no-store' });
+                if (!response.ok) throw new Error('HTTP ' + response.status);
                 const data = await response.json();
-
-                if (data.status === 'success') {
-                    const isNormalFull = data.normalCount >= MAX_NORMAL;
-                    const isVipFull = data.vipCount >= MAX_VIP;
-
-                    if (!isNormalFull || !isVipFull) {
-                        // กรณียังมีโควตาเหลือ (ทั่วไป หรือ VIP)
-                        btnReg.href = "register.html";
-                        btnReg.className = "flex-1 btn-primary py-4 font-black text-lg flex items-center justify-center gap-2 no-underline cursor-pointer";
-                        btnReg.style.pointerEvents = "auto";
-                        regIcon.className = "fi fi-sr-document-signed mt-0.5";
-                        regText.innerText = "ลงทะเบียนเข้าร่วมงาน";
-
-                        let statusText = "เปิดรับลงทะเบียนแล้ว";
-                        if (isNormalFull) statusText = "เปิดรับลงทะเบียน";
-                        else if (isVipFull) statusText = "เปิดรับลงทะเบียน";
-
-                        statusWrapper.innerHTML = `
-                            <p class="text-base font-semibold text-emerald-700 bg-emerald-50 px-6 py-3 rounded-xl border border-emerald-200 inline-flex items-center gap-2 shadow-sm">
-                                <i class="fi fi-sr-check-circle"></i> ${statusText}
-                            </p>
-                        `;
-                    } else {
-                        // กรณีเต็มทุกโควตาแล้ว
-                        btnReg.href = "#";
-                        btnReg.className = "flex-1 btn-disabled py-4 font-black text-lg flex items-center justify-center gap-2 no-underline pointer-events-none";
-                        regIcon.className = "fi fi-sr-cross-circle mt-0.5 text-rose-500";
-                        regText.innerText = "โควตาเต็มแล้ว";
-
-                        statusWrapper.innerHTML = `
-                            <p class="text-base font-semibold text-rose-600 bg-rose-50 px-6 py-3 rounded-xl border border-rose-100 inline-flex items-center gap-2 shadow-sm">
-                                <i class="fi fi-sr-cross-circle"></i> โควตาทุกรอบเต็มแล้ว
-                            </p>
-                        `;
+                // API จาก GS ต้องคืน {"G1":27,...,"G12":26} โดยไม่มี status
+                if (!data || typeof data !== 'object' || Array.isArray(data) || data.status === 'error') {
+                    throw new Error('Invalid quotas response');
+                }
+                let remaining = 0;
+                let groupsAvailable = 0;
+                for (let g = 1; g <= TOTAL_GROUPS; g++) {
+                    const count = data['G' + g];
+                    if (typeof count !== 'number' || !Number.isInteger(count) || count < 0) {
+                        throw new Error('Invalid quota for G' + g);
                     }
+                    const seatsLeft = Math.max(0, MAX_SEAT_PER_GROUP - count);
+                    remaining += seatsLeft;
+                    if (seatsLeft > 0) groupsAvailable++;
+                }
+                if (groupsAvailable > 0) {
+                    setRegistrationButton(true, 'ลงทะเบียนเข้าร่วมงาน', 'fi-sr-document-signed');
+                    setStatus('เปิดรับลงทะเบียน • เหลือ ' + remaining + ' ที่นั่ง (' + groupsAvailable + ' กลุ่ม)', 'success');
                 } else {
-                     throw new Error("Invalid response format");
+                    setRegistrationButton(false, 'ปิดรับลงทะเบียน (เต็มแล้ว)', 'fi-sr-lock');
+                    setStatus('โควต้าทั้ง 12 กลุ่มเต็มแล้ว', 'full');
                 }
             } catch (error) {
-                console.error("Error fetching quota:", error);
-                // หากการดึงข้อมูลผิดพลาด
-                btnReg.className = "flex-1 btn-disabled py-4 font-black text-lg flex items-center justify-center gap-2 no-underline pointer-events-none";
-                regIcon.className = "fi fi-sr-exclamation mt-0.5 text-orange-500";
-                regIcon.classList.remove("animate-spin");
-                regText.innerText = "ระบบขัดข้อง";
-
-                statusWrapper.innerHTML = `
-                    <p class="text-base font-semibold text-orange-600 bg-orange-50 px-6 py-3 rounded-xl border border-orange-200 inline-flex items-center gap-2 shadow-sm">
-                        <i class="fi fi-sr-triangle-warning"></i> ไม่สามารถเชื่อมต่อฐานข้อมูลได้
-                    </p>
-                `;
+                console.error('Error fetching quotas:', error);
+                setRegistrationButton(false, 'ตรวจสอบที่นั่งไม่ได้', 'fi-sr-exclamation');
+                setStatus('ไม่สามารถตรวจสอบโควต้าล่าสุดได้ กรุณารีเฟรชอีกครั้ง', 'error');
+            } finally {
+                quotaChecking = false;
             }
         }
 
-        // ฟังก์ชันจัดการจังหวะเริ่มต้น
         function initRegistration() {
-            const now = new Date().getTime();
+            const now = Date.now();
             if (now >= targetTime) {
-                // ถ้าเลยเวลา 10 โมงแล้ว ให้เช็คโควตาทันที
                 checkQuota();
+                setInterval(() => {
+                    if (Date.now() >= targetTime) checkQuota();
+                }, REFRESH_INTERVAL_MS);
             } else {
-                // ถ้ายังไม่ถึง 10 โมง ให้เริ่มนับถอยหลัง
-                startCountdown();
-                
-                // อัปเดต UI แรกสุดทันทีก่อน setInterval ทำงาน
-                updateCountdownDisplay(targetTime - now); 
+                setRegistrationButton(false, 'ยังไม่เปิดลงทะเบียน', 'fi-sr-lock');
+                updateCountdownDisplay(targetTime - now);
+                countdownInterval = setInterval(() => {
+                    const left = targetTime - Date.now();
+                    if (left > 0) {
+                        updateCountdownDisplay(left);
+                    } else {
+                        clearInterval(countdownInterval);
+                        checkQuota();
+                        setInterval(checkQuota, REFRESH_INTERVAL_MS);
+                    }
+                }, 1000);
             }
         }
 
-        // รันฟังก์ชันทันทีที่โหลดหน้าเว็บเสร็จ
-        window.onload = initRegistration;
+        window.addEventListener('DOMContentLoaded', initRegistration);
     </script>
 </body>
 </html>
