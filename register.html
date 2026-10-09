@@ -560,7 +560,7 @@
                             <div class="w-14 h-14 bg-mint-50 rounded-2xl flex items-center justify-center text-mint-500 border border-mint-200 shadow-sm"><i class="fi fi-sr-users-alt text-2xl mt-1"></i></div>
                             <div>
                                 <h2 class="text-2xl font-black text-cra-900 tracking-tight">4. เลือกกลุ่ม & แบบสำรวจ</h2>
-                                <p class="text-slate-500 font-medium text-sm">เลือกกลุ่มเข้าฐาน 1 กลุ่มเท่านั้น (รับ 18 คน/กลุ่ม)</p>
+                                <p class="text-slate-500 font-medium text-sm">เลือกกลุ่มเข้าฐาน 1 กลุ่มเท่านั้น (รับ 27 คน/กลุ่ม)</p>
                             </div>
                         </div>
 
@@ -691,7 +691,7 @@
 
     <script>
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxvCCFUo3KnDeUG4t0snFAi_dZBxJ40s6lOlVFDB80Dxh_QSwnFfW4qAknOeh2llK3SLw/exec"; 
-        const MAX_SEAT_PER_GROUP = 18;
+        const MAX_SEAT_PER_GROUP = 27;
 
         let rawSchoolData = [];
         let quotaData = {};
@@ -752,7 +752,18 @@
 
             // แอบดึงข้อมูลไว้เบื้องหลัง (Background Fetching)
             fetch(SCRIPT_URL + "?action=getSchools").then(r => r.json()).then(data => rawSchoolData = data).catch(() => []);
-            fetch(SCRIPT_URL + "?action=getQuotas&type=normal").then(r => r.json()).then(data => quotaData = data).catch(() => ({}));
+            fetch(SCRIPT_URL + "?action=getQuotas&t=" + Date.now())
+    .then(r => {
+        if (!r.ok) throw new Error("โหลดโควต้าไม่สำเร็จ");
+        return r.json();
+    })
+    .then(data => {
+        quotaData = data;
+        console.log("โควต้าล่าสุด:", quotaData);
+    })
+    .catch(err => {
+        console.error("Quota Error:", err);
+    });
 
             // ปิดหน้าโหลดทันทีในเวลาเสี้ยววิ แล้วโชว์ PDPA
             setTimeout(() => {
@@ -997,11 +1008,16 @@
             gGrid.innerHTML = '';
             for(let i = startG; i <= endG; i++) {
                 const groupName = 'G' + i;
-                let used = quotaData[groupName] || 0;
-                let remain = MAX_SEAT_PER_GROUP - used;
-                if(remain < 0) remain = 0;
-                const isFull = remain === 0;
-                const percent = (used / MAX_SEAT_PER_GROUP) * 100;
+               const used = Number(quotaData[groupName] || 0);
+
+const remain = Math.max(0, MAX_SEAT_PER_GROUP - used);
+
+const isFull = used >= MAX_SEAT_PER_GROUP;
+
+const percent = Math.min(
+    100,
+    (used / MAX_SEAT_PER_GROUP) * 100
+);
 
                 gGrid.innerHTML += `
                     <div class="group-card ${isFull ? 'disabled' : ''}" id="gcard-${i}" onclick="${isFull ? '' : `selectGroup(${i})`}">
@@ -1082,12 +1098,49 @@
                 }
                 animateStepChange(3, 'ani-next');
             } else if (s === 3) {
-                const route = document.getElementById('routeVal').value;
-                if(!route) return Swal.fire({icon: 'warning', text: 'กรุณาเลือก Route 1 หรือ Route 2 ก่อนครับ'});
-                
-                generateGroups(parseInt(route));
-                animateStepChange(4, 'ani-next');
+    const route = document.getElementById('routeVal').value;
+
+    if (!route) {
+        return Swal.fire({
+            icon: 'warning',
+            text: 'กรุณาเลือก Route 1 หรือ Route 2 ก่อนครับ'
+        });
+    }
+
+    Swal.fire({
+        title: 'กำลังตรวจสอบที่นั่ง...',
+        allowOutsideClick: false,
+        didOpen: () => Swal.showLoading()
+    });
+
+    fetch(SCRIPT_URL + "?action=getQuotas&t=" + Date.now())
+        .then(r => {
+            if (!r.ok) throw new Error("API Error");
+            return r.json();
+        })
+        .then(data => {
+            if (!data || typeof data !== 'object' ||
+                !Number.isFinite(Number(data.G6))) {
+                throw new Error("ข้อมูลโควต้าไม่ถูกต้อง");
             }
+
+            quotaData = data;
+
+            Swal.close();
+
+            generateGroups(parseInt(route, 10));
+            animateStepChange(4, 'ani-next');
+        })
+        .catch(err => {
+            console.error(err);
+
+            Swal.fire({
+                icon: 'error',
+                title: 'โหลดข้อมูลไม่สำเร็จ',
+                text: 'ไม่สามารถตรวจสอบจำนวนที่นั่งล่าสุดได้ กรุณาลองอีกครั้ง'
+            });
+        });
+}
         }
 
         function prevStep(s) { animateStepChange(s - 1, 'ani-prev'); }
@@ -1163,7 +1216,7 @@
                     window.scrollTo({ top: 0, behavior: 'smooth' });
                 } else {
                     Swal.fire('ข้อผิดพลาด', res.message, 'error').then(() => {
-                        fetch(SCRIPT_URL + "?action=getQuotas&type=normal").then(r => r.json()).then(data => {
+                        fetch(SCRIPT_URL + "?action=getQuotas&t=" + Date.now()).then(r => r.json()).then(data => {
                             quotaData = data;
                             generateGroups(parseInt(document.getElementById('routeVal').value));
                         });
