@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101e43">
+  <title>ตรวจสอบเกียรติบัตร | CRA OPEN HOUSE 2027</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <style>
+    body { font-family:'Noto Sans Thai',sans-serif; background:#f7f9fd; }
+    .appear { animation:appear .45s ease-out both }
+    @keyframes appear {from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+    .code-input { letter-spacing:.055em; text-transform:uppercase; }
+    .code-input:focus { border-color:#3b82f6; box-shadow:0 0 0 4px rgba(59,130,246,.1); }
+    .btn { transition:transform .2s,background .2s,box-shadow .2s }
+    .btn:hover:not(:disabled) { transform:translateY(-2px); box-shadow:0 10px 30px rgba(30,64,175,.2) }
+    .btn:disabled { opacity:.6;cursor:wait }
+    .spin {width:18px;height:18px;border:2px solid #fff6;border-top-color:white;border-radius:50%;animation:rotate .7s linear infinite}
+    @keyframes rotate {to{transform:rotate(360deg)}}
+  </style>
+</head>
+<body class="min-h-screen flex flex-col text-slate-800">
+  <header class="relative bg-[#101e43] text-white overflow-hidden pt-12 pb-28 px-5">
+    <div class="absolute -top-24 -right-20 w-80 h-80 rounded-full bg-blue-500/20 blur-3xl pointer-events-none"></div>
+    <div class="absolute -bottom-24 -left-24 w-80 h-80 rounded-full bg-orange-500/15 blur-3xl pointer-events-none"></div>
+    <div class="relative max-w-3xl mx-auto text-center">
+      <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-white/15 bg-white/10 text-blue-200 text-xs tracking-widest font-bold mb-6">✦ E-CERTIFICATE SYSTEM</div>
+      <h1 class="text-3xl sm:text-4xl font-black leading-tight">ระบบตรวจสอบเกียรติบัตร<br><span class="bg-gradient-to-r from-[#f7a64f] via-white to-[#7fc5ff] text-transparent bg-clip-text">CRA OPEN HOUSE 2027</span></h1>
+      <p class="mt-4 text-slate-300 text-sm sm:text-base">กรอกรหัส E-PASS เพื่อค้นหา ดู และเปิดดาวน์โหลดเกียรติบัตรของคุณ</p>
+    </div>
+  </header>
+  <main class="w-full max-w-3xl mx-auto px-4 sm:px-6 -mt-14 relative z-10 flex-1 pb-16">
+    <section class="bg-white border border-slate-100 rounded-[1.75rem] shadow-[0_20px_60px_rgba(16,30,67,.10)] p-6 sm:p-10 min-h-80">
+      <div id="searchView" class="appear">
+        <div class="w-16 h-16 rounded-2xl bg-blue-50 text-blue-600 mx-auto mb-5 grid place-items-center">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path stroke-linecap="round" d="m20 20-4-4"/></svg>
+        </div>
+        <h2 class="text-2xl font-black text-center">ค้นหาเกียรติบัตร</h2>
+        <p class="text-center text-slate-500 text-sm mt-2 mb-7">ตัวอย่างรหัส <span class="font-extrabold text-blue-600">OH000R1-G1</span></p>
+        <form id="searchForm" class="max-w-lg mx-auto" novalidate>
+          <label for="epass" class="block font-bold text-sm mb-2">รหัส E-PASS ของท่าน</label>
+          <input id="epass" name="epass" type="text" inputmode="text" maxlength="13" spellcheck="false" autocapitalize="characters" autocomplete="off" placeholder="OH000R1-G1" aria-describedby="epassHint" class="code-input w-full h-[66px] px-5 rounded-2xl border-2 border-slate-200 bg-slate-50 outline-none transition text-center font-black text-xl sm:text-2xl placeholder:font-semibold placeholder:text-slate-300">
+          <p id="epassHint" class="text-xs text-slate-400 mt-2 text-center">OH + ตัวเลข 3 หลัก + R1 หรือ R2 + -G1 ถึง G12</p>
+          <button id="searchBtn" type="submit" class="btn w-full mt-6 h-14 rounded-xl bg-[#101e43] text-white font-extrabold text-base flex items-center justify-center gap-3"><span id="searchLabel">ตรวจสอบเกียรติบัตร</span><span id="searchSpin" class="spin hidden"></span></button>
+        </form>
+        <p class="text-center text-xs text-slate-400 mt-6">ระบบจะแสดงเกียรติบัตรที่มีอยู่ในฐานข้อมูลเท่านั้น</p>
+      </div>
+      <div id="certView" class="appear hidden">
+        <div class="w-16 h-16 rounded-full bg-emerald-100 text-emerald-600 mx-auto grid place-items-center text-3xl mb-4">✓</div>
+        <h2 class="text-2xl font-black text-center">พบเกียรติบัตรของคุณ</h2>
+        <p id="resultName" class="text-center text-slate-600 mt-2 font-bold"></p>
+        <p id="resultEpass" class="text-center text-blue-600 font-black mt-1 mb-6"></p>
+        <div class="bg-[#152545] rounded-3xl p-4 sm:p-6 max-w-xl mx-auto shadow-lg">
+          <p class="text-white font-extrabold mb-4">✦ E-Certificate</p>
+          <div id="previewFrame" class="bg-white rounded-xl overflow-hidden aspect-[1.414/1] grid place-items-center relative">
+            <img id="certificateImage" alt="ภาพตัวอย่างเกียรติบัตร" class="hidden w-full h-full object-contain" referrerpolicy="no-referrer">
+            <div id="previewFallback" class="p-4 text-slate-500 text-sm font-semibold text-center">กำลังโหลดภาพตัวอย่างเกียรติบัตร...</div>
+          </div>
+          <a id="certLink" class="btn block w-full mt-5 px-4 py-4 rounded-xl bg-blue-500 hover:bg-blue-400 text-white text-center font-extrabold" target="_blank" rel="noopener noreferrer">เปิดเกียรติบัตร / ดาวน์โหลด PDF ↗</a>
+          <p class="text-slate-300 text-xs mt-3 text-center">กรณีภาพตัวอย่างไม่ปรากฏ ให้กดปุ่มเปิดไฟล์ด้านบน</p>
+        </div>
+        <div class="max-w-xl mx-auto bg-orange-50 border border-orange-100 rounded-2xl px-5 py-4 mt-6 text-sm">
+          <p class="text-orange-900 font-bold">ข้อมูลบนเกียรติบัตรไม่ถูกต้อง?</p>
+          <p class="text-orange-800/80 mt-1">สามารถแจ้งทีมงานเพื่อขอตรวจสอบและแก้ไขข้อมูลได้</p>
+          <a id="reportLink" class="font-extrabold text-blue-700 inline-block mt-2 underline underline-offset-4">แจ้งปัญหาทางอีเมล ↗</a>
+        </div>
+        <button id="backBtn" type="button" class="block mx-auto mt-7 font-bold text-slate-600 hover:text-blue-600 underline underline-offset-4">ค้นหา E-PASS อื่น</button>
+      </div>
+    </section>
+    <p class="text-center text-slate-400 text-xs mt-7">CRA OPEN HOUSE 2027 · E-Certificate Verification</p>
+  </main>
+  <script>
+    // IMPORTANT: paste your own NEW Apps Script Web App /exec URL here.
+    const SCRIPT_URL = 'PASTE_YOUR_NEW_WEB_APP_EXEC_URL_HERE';
+    const CONTACT_EMAIL = 'craopenhouse@gmail.com';
+    const epassInput = document.getElementById('epass');
+    const searchBtn = document.getElementById('searchBtn');
+    const searchLabel = document.getElementById('searchLabel');
+    const searchSpin = document.getElementById('searchSpin');
+    const searchView = document.getElementById('searchView');
+    const certView = document.getElementById('certView');
+    const EPASS_PATTERN = /^OH\d{3}R[12]-G(?:[1-9]|1[0-2])$/;
+    let busy = false;
+
+    epassInput.addEventListener('input', () => {
+      const start = epassInput.selectionStart;
+      epassInput.value = epassInput.value.toUpperCase().replace(/\s/g,'').replace(/[–—−]/g,'-');
+      try { epassInput.setSelectionRange(start,start) } catch (_) {}
+    });
+    document.getElementById('searchForm').addEventListener('submit', async e => {
+      e.preventDefault();
+      if (busy) return;
+      const epass = epassInput.value.trim().toUpperCase();
+      if (!EPASS_PATTERN.test(epass)) {
+        return Swal.fire({icon:'warning',title:'รูปแบบ E-PASS ไม่ถูกต้อง',text:'กรุณากรอกรหัส เช่น OH000R1-G1 หรือ OH123R2-G12',confirmButtonColor:'#1d4ed8'});
+      }
+      if (!SCRIPT_URL.startsWith('https://script.google.com/macros/s/AKfycbxuJDCmmiPCrI0ujJWaJgrko3TgntfagOxcyHreYWkYiWeG9Xh0-N_SnrBviHBf0huH_Q/exec')) {
+        return Swal.fire('ยังไม่ได้ตั้งค่า','กรุณาใส่ URL ของ Apps Script Web App ในตัวแปร SCRIPT_URL','warning');
+      }
+      setBusy(true);
+      try {
+        const found = await callApi('lookup',epass);
+        if (found.status === 'not_found' || found.status === 'no_certificate') {
+          return Swal.fire({icon:'info',title:'ไม่พบเกียรติบัตร',text:found.message || 'ไม่พบข้อมูลที่ค้นหา',confirmButtonColor:'#1d4ed8'});
+        }
+        if (found.status !== 'success') throw Error(found.message || 'ไม่สามารถค้นหาได้');
+        const safeName = escapeHtml(found.name || 'ผู้เข้าร่วมโครงการ');
+        const result = await Swal.fire({icon:'question',title:'ใช่ข้อมูลของท่านหรือไม่?',html:`<p class="mb-1"><strong>${escapeHtml(found.epass)}</strong></p><p>${safeName}</p>`,showCancelButton:true,confirmButtonText:'ใช่ เปิดเกียรติบัตร',cancelButtonText:'ย้อนกลับ',confirmButtonColor:'#2563eb',cancelButtonColor:'#94a3b8'});
+        if (!result.isConfirmed) return;
+        Swal.fire({title:'กำลังเปิดเกียรติบัตร',text:'กำลังดึงไฟล์และบันทึกวันเวลาเปิดดู',allowOutsideClick:false,allowEscapeKey:false,didOpen:()=>Swal.showLoading()});
+        const opened = await callApi('open',epass);
+        Swal.close();
+        if (opened.status === 'no_certificate') return Swal.fire('ยังไม่มีเกียรติบัตร',opened.message,'info');
+        if (opened.status !== 'success' || !opened.certificate) throw Error(opened.message || 'ไม่พบไฟล์เกียรติบัตร');
+        showCertificate(opened);
+      } catch (error) {
+        Swal.close();
+        Swal.fire({icon:'error',title:'ไม่สามารถดำเนินการได้',text:error.message || 'โปรดลองใหม่อีกครั้ง',confirmButtonColor:'#2563eb'});
+      } finally { setBusy(false) }
+    });
+
+    function setBusy(state) {
+      busy = state; searchBtn.disabled=state;
+      searchLabel.textContent=state?'กำลังตรวจสอบ...':'ตรวจสอบเกียรติบัตร';
+      searchSpin.classList.toggle('hidden',!state);
+    }
+    async function callApi(action,epass) {
+      const url = new URL(SCRIPT_URL);
+      url.searchParams.set('action',action);
+      url.searchParams.set('epass',epass);
+      // Redirected ContentService GET endpoint; no preflight/custom headers.
+      const response = await fetch(url.toString(),{method:'GET',redirect:'follow',cache:'no-store'});
+      if (!response.ok) throw Error('เชื่อมต่อระบบไม่สำเร็จ (HTTP '+response.status+')');
+      return await response.json();
+    }
+    function escapeHtml(value) {
+      return String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    }
+    function getDriveId(url) {
+      const m=String(url||'').match(/(?:\/file\/d\/|[?&]id=)([A-Za-z0-9_-]{25,})/);
+      return m?m[1]:'';
+    }
+    function showCertificate(data) {
+      searchView.classList.add('hidden'); certView.classList.remove('hidden');
+      document.getElementById('resultName').textContent=data.name || 'ผู้เข้าร่วมโครงการ';
+      document.getElementById('resultEpass').textContent=data.epass;
+      const link=document.getElementById('certLink');
+      // Validate URL before creating an external navigation target.
+      let certUrl;
+      try { certUrl = new URL(data.certificate) } catch (_) { throw Error('ลิงก์เกียรติบัตรไม่ถูกต้อง') }
+      if (certUrl.protocol !== 'https:') throw Error('ลิงก์เกียรติบัตรไม่ปลอดภัย');
+      link.href=certUrl.href;
+      const img=document.getElementById('certificateImage');
+      const fallback=document.getElementById('previewFallback');
+      img.classList.add('hidden'); img.removeAttribute('src');
+      fallback.classList.remove('hidden');
+      fallback.textContent='กำลังโหลดภาพตัวอย่างเกียรติบัตร...';
+      const id=getDriveId(certUrl.href);
+      if (id) {
+        img.onload=()=>{img.classList.remove('hidden');fallback.classList.add('hidden')};
+        img.onerror=()=>{img.classList.add('hidden');fallback.textContent='ไม่สามารถแสดงภาพตัวอย่างได้ กรุณากดปุ่มเปิดเกียรติบัตร'};
+        img.src=`https://drive.google.com/thumbnail?id=${encodeURIComponent(id)}&sz=w1200`;
+      } else {
+        fallback.textContent='กดปุ่มด้านล่างเพื่อเปิดเกียรติบัตร';
+      }
+      const subject=encodeURIComponent('แจ้งปัญหาเกียรติบัตร CRA OPEN HOUSE 2027 - '+data.epass);
+      const body=encodeURIComponent(`E-PASS: ${data.epass}\nชื่อ-สกุล: ${data.name || ''}\nรายละเอียดปัญหา:\n`);
+      document.getElementById('reportLink').href=`mailto:${CONTACT_EMAIL}?subject=${subject}&body=${body}`;
+      certView.scrollIntoView({behavior:'smooth',block:'start'});
+    }
+    document.getElementById('backBtn').addEventListener('click',()=>{
+      certView.classList.add('hidden');searchView.classList.remove('hidden');
+      epassInput.value='';epassInput.focus();
+    });
+  </script>
+</body>
+</html>
