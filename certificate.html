@@ -40,9 +40,19 @@
         <h2 class="text-2xl font-black text-center">ค้นหาเกียรติบัตร</h2>
         <p class="text-center text-slate-500 text-sm mt-2 mb-7">ตัวอย่างรหัส <span class="font-extrabold text-blue-600">OH000R1-G1</span></p>
         <form id="searchForm" class="max-w-lg mx-auto" novalidate>
-          <label for="epass" class="block font-bold text-sm mb-2">รหัส E-PASS ของท่าน</label>
-          <input id="epass" name="epass" type="text" inputmode="text" maxlength="13" spellcheck="false" autocapitalize="characters" autocomplete="off" placeholder="OH000R1-G1" aria-describedby="epassHint" class="code-input w-full h-[66px] px-5 rounded-2xl border-2 border-slate-200 bg-slate-50 outline-none transition text-center font-black text-xl sm:text-2xl placeholder:font-semibold placeholder:text-slate-300">
-          <p id="epassHint" class="text-xs text-slate-400 mt-2 text-center">OH + ตัวเลข 3 หลัก + R1 หรือ R2 + -G1 ถึง G12</p>
+          <label for="codeNumber" class="block font-bold text-sm mb-3">ระบุเฉพาะตัวเลขบน E-PASS</label>
+          <div class="flex items-center justify-center gap-1.5 sm:gap-3 rounded-2xl bg-slate-50 border-2 border-slate-200 px-2 sm:px-5 py-4">
+            <span class="text-xl sm:text-2xl font-black text-[#101e43] shrink-0">OH</span>
+            <input id="codeNumber" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="3" placeholder="000" autocomplete="off" aria-label="หมายเลข E-PASS สามหลัก" class="code-input w-[83px] sm:w-[104px] min-w-0 h-14 text-center text-xl sm:text-2xl font-black rounded-xl bg-white border-2 border-slate-200 outline-none focus:border-blue-500 transition" required>
+            <span class="text-xl sm:text-2xl font-black text-[#101e43] shrink-0">R</span>
+            <input id="routeNumber" type="text" inputmode="numeric" pattern="[1-2]" maxlength="1" placeholder="1" autocomplete="off" aria-label="หมายเลข Route หนึ่งหรือสอง" class="w-[47px] sm:w-[55px] min-w-0 h-14 text-center text-xl sm:text-2xl font-black rounded-xl bg-white border-2 border-slate-200 outline-none focus:border-blue-500 transition" required>
+            <span class="text-xl sm:text-2xl font-black text-[#101e43] shrink-0">-G</span>
+            <input id="groupNumber" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="2" placeholder="1" autocomplete="off" aria-label="หมายเลขกลุ่มหนึ่งถึงสิบสอง" class="w-[54px] sm:w-[66px] min-w-0 h-14 text-center text-xl sm:text-2xl font-black rounded-xl bg-white border-2 border-slate-200 outline-none focus:border-blue-500 transition" required>
+          </div>
+          <div class="flex flex-col items-center gap-1 mt-3">
+            <p class="text-xs text-slate-500 text-center">รหัส 3 หลัก (รวมเลขศูนย์นำหน้า) · Route 1–2 · กลุ่ม 1–12</p>
+            <p class="font-bold text-sm text-slate-500">รหัสที่กำลังค้นหา: <span id="epassPreview" class="text-blue-600 font-black">OH___R_-G__</span></p>
+          </div>
           <button id="searchBtn" type="submit" class="btn w-full mt-6 h-14 rounded-xl bg-[#101e43] text-white font-extrabold text-base flex items-center justify-center gap-3"><span id="searchLabel">ตรวจสอบเกียรติบัตร</span><span id="searchSpin" class="spin hidden"></span></button>
         </form>
         <p class="text-center text-xs text-slate-400 mt-6">ระบบจะแสดงเกียรติบัตรที่มีอยู่ในฐานข้อมูลเท่านั้น</p>
@@ -73,9 +83,12 @@
   </main>
   <script>
     // IMPORTANT: paste your own NEW Apps Script Web App /exec URL here.
-    const SCRIPT_URL = 'PASTE_YOUR_NEW_WEB_APP_EXEC_URL_HERE';
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxuJDCmmiPCrI0ujJWaJgrko3TgntfagOxcyHreYWkYiWeG9Xh0-N_SnrBviHBf0huH_Q/exec';
     const CONTACT_EMAIL = 'craopenhouse@gmail.com';
-    const epassInput = document.getElementById('epass');
+    const codeInput = document.getElementById('codeNumber');
+    const routeInput = document.getElementById('routeNumber');
+    const groupInput = document.getElementById('groupNumber');
+    const epassPreview = document.getElementById('epassPreview');
     const searchBtn = document.getElementById('searchBtn');
     const searchLabel = document.getElementById('searchLabel');
     const searchSpin = document.getElementById('searchSpin');
@@ -84,19 +97,28 @@
     const EPASS_PATTERN = /^OH\d{3}R[12]-G(?:[1-9]|1[0-2])$/;
     let busy = false;
 
-    epassInput.addEventListener('input', () => {
-      const start = epassInput.selectionStart;
-      epassInput.value = epassInput.value.toUpperCase().replace(/\s/g,'').replace(/[–—−]/g,'-');
-      try { epassInput.setSelectionRange(start,start) } catch (_) {}
+    const digits = value => value.replace(/[^0-9]/g, '');
+    function updatePreview() {
+      const code = codeInput.value || '___';
+      const route = routeInput.value || '_';
+      const group = groupInput.value || '__';
+      epassPreview.textContent = `OH${code}R${route}-G${group}`;
+    }
+    [codeInput,routeInput,groupInput].forEach((el,index,inputs) => {
+      el.addEventListener('input', () => {
+        el.value = digits(el.value).slice(0, index === 0 ? 3 : index === 1 ? 1 : 2);
+        updatePreview();
+        if (el.value.length === el.maxLength && index < 2) inputs[index+1].focus();
+      });
     });
     document.getElementById('searchForm').addEventListener('submit', async e => {
       e.preventDefault();
       if (busy) return;
-      const epass = epassInput.value.trim().toUpperCase();
+      const epass = `OH${codeInput.value}R${routeInput.value}-G${groupInput.value}`;
       if (!EPASS_PATTERN.test(epass)) {
-        return Swal.fire({icon:'warning',title:'รูปแบบ E-PASS ไม่ถูกต้อง',text:'กรุณากรอกรหัส เช่น OH000R1-G1 หรือ OH123R2-G12',confirmButtonColor:'#1d4ed8'});
+        return Swal.fire({icon:'warning',title:'รูปแบบ E-PASS ไม่ถูกต้อง',text:'กรุณากรอกเลขรหัส 3 หลัก, Route 1 หรือ 2 และกลุ่ม 1 ถึง 12 ให้ถูกต้อง',confirmButtonColor:'#1d4ed8'});
       }
-      if (!SCRIPT_URL.startsWith('https://script.google.com/macros/s/AKfycbxuJDCmmiPCrI0ujJWaJgrko3TgntfagOxcyHreYWkYiWeG9Xh0-N_SnrBviHBf0huH_Q/exec')) {
+      if (!SCRIPT_URL.startsWith('https://script.google.com/macros/s/')) {
         return Swal.fire('ยังไม่ได้ตั้งค่า','กรุณาใส่ URL ของ Apps Script Web App ในตัวแปร SCRIPT_URL','warning');
       }
       setBusy(true);
@@ -172,7 +194,7 @@
     }
     document.getElementById('backBtn').addEventListener('click',()=>{
       certView.classList.add('hidden');searchView.classList.remove('hidden');
-      epassInput.value='';epassInput.focus();
+      codeInput.value='';routeInput.value='';groupInput.value='';updatePreview();codeInput.focus();
     });
   </script>
 </body>
