@@ -1,317 +1,67 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mailer Control | CRA OPEN HOUSE 2027</title>
-
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <link rel='stylesheet' href='https://cdn-uicons.flaticon.com/2.1.0/uicons-solid-rounded/css/uicons-solid-rounded.css'>
-
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: { sans: ['"Noto Sans Thai"', 'sans-serif'] },
-                    colors: {
-                        cra: { 50: '#f0f9ff', 100: '#e0f2fe', 400: '#38bdf8', 500: '#0ea5e9', 600: '#0284c7', 900: '#1e3a8a' },
-                        mint: { 50: '#ecfdf5', 400: '#34d399', 500: '#10b981' },
-                        gold: { 50: '#fefce8', 400: '#facc15', 500: '#eab308', 600: '#ca8a04' }
-                    }
-                }
-            }
-        }
-    </script>
-    <style>
-        body { font-family: 'Noto Sans Thai', sans-serif; background-color: #f8fafc; }
-        .glass-card { background: #ffffff; border-radius: 2rem; box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.05); border: 1px solid #f1f5f9; }
-        .input-field { width: 100%; padding: 1rem 1.25rem; border-radius: 1rem; border: 2px solid #e2e8f0; outline: none; transition: all 0.2s ease; font-family: 'Noto Sans Thai', sans-serif; font-size: 0.95rem; }
-        .input-field:focus { border-color: #0ea5e9; box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.1); }
-        select.input-field { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2394a3b8'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 1rem center; background-size: 1.5em 1.5em; padding-right: 2.5rem; cursor: pointer; }
-    </style>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CRA Certificate Mailer | OPEN HOUSE 2027</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<style>
+body{font-family:'Noto Sans Thai',sans-serif;background:#f6f8fc;color:#243147}.card{background:white;border:1px solid #e9eef5;border-radius:24px;padding:25px;box-shadow:0 12px 32px #15274c0b}.field{width:100%;padding:12px 15px;border:1.5px solid #dce5ee;border-radius:12px;background:#fff;outline:none}.field:focus{border-color:#129edf;box-shadow:0 0 0 3px #129edf15}.btn{background:#0284c7;color:white;border-radius:12px;padding:13px 18px;font-weight:800}.btn:disabled{opacity:.55;cursor:not-allowed}.hint{color:#64748b;font-size:13px}
+</style>
 </head>
-<body class="min-h-screen text-slate-800 p-4 md:p-8">
-
-    <div class="max-w-6xl mx-auto space-y-6">
-        <!-- Header -->
-        <div class="flex flex-col md:flex-row justify-between items-center bg-cra-900 rounded-3xl p-6 md:p-8 text-white shadow-xl relative overflow-hidden">
-            <div class="absolute top-0 right-0 w-64 h-64 bg-cra-500 rounded-full mix-blend-screen filter blur-[80px] opacity-30"></div>
-            <div class="relative z-10">
-                <h1 class="text-3xl font-black mb-1">CRA Certificate Mailer</h1>
-                <p class="text-cra-200 font-medium">ระบบควบคุมการจัดส่งเกียรติบัตรอิเล็กทรอนิกส์</p>
-            </div>
-            <button onclick="fetchStats()" class="mt-4 md:mt-0 bg-white/10 hover:bg-white/20 backdrop-blur border border-white/20 px-6 py-3 rounded-xl font-bold transition flex items-center gap-2 z-10 shadow-sm">
-                <i class="fi fi-sr-refresh"></i> อัปเดตข้อมูล
-            </button>
-        </div>
-
-        <!-- Stats Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <!-- Total Participants -->
-            <div class="glass-card p-6 md:p-8">
-                <div class="flex justify-between items-start mb-6">
-                    <div>
-                        <h2 class="text-xl font-black text-cra-900">ผู้ตอบแบบสอบถามทั้งหมด</h2>
-                        <p class="text-slate-500 text-sm font-medium">รายชื่อที่มีอีเมลในระบบ</p>
-                    </div>
-                    <div class="w-12 h-12 bg-cra-50 text-cra-500 rounded-xl flex justify-center items-center text-2xl border border-cra-100 shadow-sm"><i class="fi fi-sr-users-alt"></i></div>
-                </div>
-                <div class="flex items-end gap-2 mb-2">
-                    <span class="text-5xl font-black text-cra-600" id="stat-total">0</span>
-                    <span class="text-lg font-bold text-slate-400 mb-1">คน</span>
-                </div>
-            </div>
-
-            <!-- Sent Stat -->
-            <div class="glass-card p-6 md:p-8 relative overflow-hidden border-2 border-mint-100">
-                <div class="absolute -right-4 -top-4 w-32 h-32 bg-mint-50 rounded-full blur-[40px] opacity-60 pointer-events-none"></div>
-                <div class="flex justify-between items-start mb-6 relative z-10">
-                    <div>
-                        <h2 class="text-xl font-black text-mint-600">จัดส่งเกียรติบัตรแล้ว</h2>
-                        <p class="text-slate-500 text-sm font-medium">บันทึกข้อมูลลงในคอลัมน์ DB เรียบร้อย</p>
-                    </div>
-                    <div class="w-12 h-12 bg-mint-50 text-mint-500 rounded-xl flex justify-center items-center text-2xl border border-mint-200 shadow-sm"><i class="fi fi-sr-badge-check"></i></div>
-                </div>
-                <div class="flex items-end gap-2 mb-2 relative z-10">
-                    <span class="text-5xl font-black text-mint-500" id="stat-sent">0</span>
-                    <span class="text-lg font-bold text-slate-400 mb-1" id="stat-target">/ 0</span>
-                </div>
-                <div class="w-full bg-slate-100 h-3 rounded-full overflow-hidden mt-4 relative z-10 shadow-inner">
-                    <div id="bar-sent" class="h-full bg-gradient-to-r from-mint-400 to-mint-500 transition-all duration-1000" style="width: 0%"></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Mail System -->
-        <div class="glass-card p-6 md:p-8">
-            <h2 class="text-2xl font-black text-slate-800 mb-2 flex items-center gap-3">
-                <i class="fi fi-sr-envelope-open-text text-cra-500 text-3xl"></i> การตั้งค่าเนื้อหาและการจัดส่ง
-            </h2>
-            <div class="bg-blue-50 border border-blue-200 text-blue-800 px-4 py-4 rounded-xl flex items-start gap-3 mb-6 shadow-sm">
-                <i class="fi fi-sr-info text-blue-500 text-xl mt-0.5"></i>
-                <div class="text-sm font-medium leading-relaxed">
-                    <strong>ข้อควรระวังเกี่ยวกับโควตา:</strong> บัญชี Gmail ทั่วไปส่งอีเมลผ่านสคริปต์ได้ <strong>สูงสุด 100 ฉบับ/วัน</strong> (Google Workspace ส่งได้ 1,500 ฉบับ) 
-                    หากโควตาหมด ให้กลับมากดส่งต่อในวันพรุ่งนี้ ระบบจะตรวจเช็คคอลัมน์ DB และข้ามคนที่ "ส่งแล้ว" ให้อัตโนมัติ
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                <!-- Status & Cooldown -->
-                <div class="lg:col-span-1 space-y-4">
-                    <div class="bg-slate-50 border border-slate-200 p-5 rounded-2xl shadow-sm">
-                        <p class="text-sm font-bold text-slate-500 mb-1 uppercase tracking-widest">โควตาของคุณวันนี้</p>
-                        <div class="flex items-end gap-2 text-cra-900">
-                            <span class="text-4xl font-black" id="mail-quota">0</span>
-                            <span class="text-lg font-bold text-slate-400 mb-1">ฉบับ</span>
-                        </div>
-                        <p class="text-xs text-slate-400 mt-2 font-medium">(ดึงข้อมูลเรียลไทม์จากระบบ Google)</p>
-                    </div>
-                    <div class="bg-orange-50 border border-orange-200 p-5 rounded-2xl shadow-sm">
-                        <p class="text-sm font-bold text-orange-600 mb-1 uppercase tracking-widest">คิวที่รอจัดส่ง</p>
-                        <div class="text-4xl font-black text-orange-500" id="mail-pending">0 <span class="text-lg text-orange-400">คน</span></div>
-                    </div>
-                    <div class="bg-slate-800 text-white p-5 rounded-2xl shadow-sm">
-                        <p class="text-sm font-bold text-slate-300 mb-2 uppercase tracking-widest"><i class="fi fi-sr-time-fast"></i> รีเซ็ตโควตาใหม่ในอีก</p>
-                        <div class="text-2xl font-black text-white tracking-wider" id="countdown-timer">--:--:--</div>
-                        <p class="text-xs text-slate-400 mt-1 font-medium">เวลาเที่ยงคืน (00:00 น.)</p>
-                    </div>
-                </div>
-
-                <!-- Email Editor -->
-                <div class="lg:col-span-2 bg-slate-50 p-6 rounded-3xl border border-slate-200 shadow-sm flex flex-col">
-                    <label class="block text-sm font-bold text-slate-700 mb-2">หัวข้ออีเมล (Subject)</label>
-                    <input type="text" id="mailSubject" class="input-field mb-4 shadow-sm font-bold" value="เกียรติบัตรเข้าร่วมกิจกรรม CRA OPEN HOUSE 2027">
-                    
-                    <label class="block text-sm font-bold text-slate-700 mb-2">เนื้อหาอีเมล (Message)</label>
-                    <textarea id="mailBody" rows="10" class="input-field resize-none leading-relaxed text-sm shadow-sm mb-4 flex-1">สวัสดีคุณ {{NAME}}
+<body class="p-4 md:p-8">
+<main class="max-w-6xl mx-auto space-y-6">
+<header class="rounded-3xl bg-gradient-to-r from-blue-950 to-blue-800 text-white p-7 md:p-9 flex flex-wrap justify-between items-center gap-4">
+<div><h1 class="text-2xl md:text-3xl font-black">CRA Certificate Mailer</h1><p class="text-blue-200 mt-1">ระบบจัดส่งเกียรติบัตร • CRA OPEN HOUSE 2027</p></div>
+<button onclick="fetchStats()" class="bg-white/15 hover:bg-white/25 px-5 py-3 rounded-xl font-bold">↻ อัปเดตข้อมูล</button>
+</header>
+<section class="grid md:grid-cols-3 gap-4">
+<div class="card"><p class="font-bold text-blue-950">ผู้มีอีเมลในระบบ</p><strong id="stat-total" class="block text-4xl text-sky-600 mt-3">—</strong></div>
+<div class="card"><p class="font-bold text-blue-950">ส่งแล้ว</p><strong id="stat-sent" class="block text-4xl text-emerald-600 mt-3">—</strong></div>
+<div class="card"><p class="font-bold text-blue-950">คิวรอส่ง / โควตาที่เหลือ</p><div class="mt-3"><strong id="mail-pending" class="text-4xl text-orange-500">—</strong><span class="mx-2 text-slate-400">/</span><strong id="mail-quota" class="text-3xl text-blue-700">—</strong></div></div>
+</section>
+<section class="card space-y-5">
+<div><h2 class="text-xl font-black text-blue-950">ตั้งค่าอีเมล</h2><p class="hint mt-1">ใช้ข้อความเดียวกันได้ทั้งส่งจริงและส่งทดสอบ โดยทดสอบจะไม่บันทึกคอลัมน์ DB</p></div>
+<div class="max-w-xl"><label for="adminKey" class="block font-bold text-sm mb-2">รหัสผู้ดูแลระบบ (Admin Token)</label><input id="adminKey" type="password" autocomplete="off" class="field" placeholder="รหัสที่ตั้งใน Script Properties: MAILER_ADMIN_TOKEN"><p class="hint mt-1">ต้องกรอกก่อนส่ง • ระบบไม่เก็บรหัสลงเบราว์เซอร์</p></div>
+<div><label for="mailSubject" class="block font-bold text-sm mb-2">หัวข้ออีเมล</label><input id="mailSubject" class="field" value="เกียรติบัตรเข้าร่วมกิจกรรม CRA OPEN HOUSE 2027"></div>
+<div><label for="mailBody" class="block font-bold text-sm mb-2">เนื้อหาอีเมล</label><textarea id="mailBody" rows="10" class="field leading-relaxed">สวัสดีคุณ {{NAME}}
 
 ขอมอบเกียรติบัตรนี้ให้เพื่อแสดงว่าท่านได้ผ่านการเข้าร่วมกิจกรรม
 
-ขอขอบคุณทุกท่านที่มาร่วมงาน CRA Open House 2027 กิจกรรมเชิงปฏิบัติการ (Workshop) และเยี่ยมชมศูนย์การรักษา โรงพยาบาลจุฬาภรณ์ ในวันที่ 11 ตุลาคม 2569 นี้
+ขอขอบคุณทุกท่านที่มาร่วมงาน CRA Open House 2027 กิจกรรมเชิงปฏิบัติการ (Workshop) และเยี่ยมชมศูนย์การรักษา โรงพยาบาลจุฬาภรณ์ ในวันที่ 11 ตุลาคม 2569
 
 รหัส E-PASS ของท่าน: {{ID}}
 ลิงก์ดาวน์โหลดเกียรติบัตร: {{CERT_URL}}
 
 ด้วยความเคารพอย่างสูง,
-ทีมงานผู้จัดกิจกรรม</textarea>
-                    
-                    <div class="bg-yellow-50 border border-yellow-200 rounded-xl p-3 mb-4 text-xs font-bold text-yellow-700">
-                        * ตัวแปร <span class="bg-yellow-200 px-1 rounded">{{NAME}}</span>, <span class="bg-yellow-200 px-1 rounded">{{ID}}</span>, และ <span class="bg-yellow-200 px-1 rounded">{{CERT_URL}}</span> จะถูกแทนที่ด้วยข้อมูลของแต่ละคนอัตโนมัติ
-                    </div>
-
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
-                        <div>
-                            <label class="block text-sm font-bold text-slate-700 mb-2">จำนวนอีเมลที่ต้องการส่งในคลิกนี้</label>
-                            <select id="sendLimit" class="input-field shadow-sm font-bold text-cra-600">
-                                <option value="20">ส่ง 20 ฉบับ</option>
-                                <option value="50">ส่ง 50 ฉบับ</option>
-                                <option value="80">ส่ง 80 ฉบับ</option>
-                                <option value="100" selected>ส่ง 100 ฉบับ (เต็มโควตา Gmail พื้นฐาน)</option>
-                                <option value="500">ส่ง 500 ฉบับ (เฉพาะ Workspace)</option>
-                            </select>
-                        </div>
-                        <button id="btnSendMail" onclick="sendBulkMails()" class="w-full bg-gradient-to-r from-cra-600 to-cra-400 text-white font-black text-lg py-4 rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all flex items-center justify-center gap-2 h-[54px]">
-                            <i class="fi fi-sr-paper-plane"></i> เริ่มส่งอีเมล
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        // ⚠️ ใส่ Web App URL ของคุณที่นี่ (หลังจาก Deploy ใหม่)
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxuJDCmmiPCrI0ujJWaJgrko3TgntfagOxcyHreYWkYiWeG9Xh0-N_SnrBviHBf0huH_Q/exec"; 
-        
-        let quotaRemaining = 0;
-        let pendingMails = 0;
-
-        window.onload = () => {
-            fetchStats();
-            startCountdown();
-        };
-
-        function fetchStats() {
-            Swal.fire({ title: 'กำลังโหลดข้อมูล...', allowOutsideClick: false, didOpen: () => Swal.showLoading(), customClass: { popup: 'rounded-2xl' } });
-            
-            fetch(SCRIPT_URL + "?action=getDashboardStats")
-            .then(res => res.json())
-            .then(data => {
-                Swal.close();
-                if(data.status === 'success') {
-                    // อัปเดตการ์ด
-                    animateValue('stat-total', 0, data.totalCount, 1000);
-                    animateValue('stat-sent', 0, data.sentCount, 1000);
-                    document.getElementById('stat-target').innerText = `/ ${data.totalCount}`;
-                    
-                    let pct = data.totalCount > 0 ? (data.sentCount / data.totalCount * 100) : 0;
-                    document.getElementById('bar-sent').style.width = pct + '%';
-
-                    // อัปเดตโควตา
-                    quotaRemaining = data.quotaRemaining;
-                    pendingMails = data.unsentCount;
-
-                    document.getElementById('mail-quota').innerText = quotaRemaining;
-                    document.getElementById('mail-pending').innerHTML = `${pendingMails} <span class="text-lg text-orange-400">คน</span>`;
-                    
-                    updateSendButton();
-                }
-            }).catch(e => {
-                Swal.fire('Error', 'ไม่สามารถเชื่อมต่อฐานข้อมูลได้', 'error');
-            });
-        }
-
-        function updateSendButton() {
-            const btn = document.getElementById('btnSendMail');
-            const limitSelect = document.getElementById('sendLimit');
-            const requestedLimit = parseInt(limitSelect.value);
-
-            if (quotaRemaining <= 0 || pendingMails === 0) {
-                btn.disabled = true;
-                btn.classList.add('opacity-50', 'cursor-not-allowed');
-                btn.classList.remove('hover:shadow-xl', 'hover:-translate-y-1');
-                if(quotaRemaining <= 0) btn.innerHTML = '<i class="fi fi-sr-ban"></i> โควตาวันนี้หมดแล้ว';
-                else btn.innerHTML = '<i class="fi fi-sr-check-circle"></i> จัดส่งครบทุกคนแล้ว';
-            } else {
-                btn.disabled = false;
-                btn.classList.remove('opacity-50', 'cursor-not-allowed');
-                btn.classList.add('hover:shadow-xl', 'hover:-translate-y-1');
-                
-                // คำนวณยอดที่ส่งได้จริง
-                const actualSendCount = Math.min(requestedLimit, quotaRemaining, pendingMails);
-                btn.innerHTML = `<i class="fi fi-sr-paper-plane"></i> ยืนยันส่ง ${actualSendCount} ฉบับ`;
-            }
-        }
-
-        document.getElementById('sendLimit').addEventListener('change', updateSendButton);
-
-        function sendBulkMails() {
-            const subject = document.getElementById('mailSubject').value.trim();
-            const body = document.getElementById('mailBody').value.trim();
-            const requestedLimit = parseInt(document.getElementById('sendLimit').value);
-            const actualSendCount = Math.min(requestedLimit, quotaRemaining, pendingMails);
-
-            if(!subject || !body) return Swal.fire('แจ้งเตือน', 'กรุณากรอกหัวข้อและเนื้อหาอีเมลให้ครบ', 'warning');
-
-            Swal.fire({
-                title: 'ยืนยันการจัดส่ง',
-                html: `ระบบจะดึงรายชื่อที่ยังไม่ได้รับเกียรติบัตรและส่งออกจำนวน <b>${actualSendCount}</b> ฉบับ<br>แน่ใจหรือไม่?`,
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonText: 'ยืนยันการส่ง',
-                cancelButtonText: 'ยกเลิก',
-                confirmButtonColor: '#0ea5e9',
-                customClass: { popup: 'rounded-2xl', confirmButton: 'rounded-xl px-6', cancelButton: 'rounded-xl px-6' }
-            }).then((result) => {
-                if(result.isConfirmed) {
-                    const btn = document.getElementById('btnSendMail');
-                    btn.disabled = true;
-                    btn.innerHTML = '<i class="fi fi-sr-spinner animate-spin"></i> ระบบกำลังส่ง ห้ามปิดหน้านี้...';
-                    btn.classList.remove('hover:-translate-y-1');
-
-                    fetch(SCRIPT_URL, {
-                        method: 'POST',
-                        body: JSON.stringify({ 
-                            action: 'sendBulkMails', 
-                            subject: subject, 
-                            message: body,
-                            limit: actualSendCount
-                        })
-                    }).then(r => r.json()).then(res => {
-                        if(res.status === 'success') {
-                            Swal.fire({
-                                icon: 'success',
-                                title: 'ส่งสำเร็จ!',
-                                text: `ระบบจัดส่งเกียรติบัตรสำเร็จจำนวน ${res.sentCount} ฉบับ`,
-                                confirmButtonColor: '#0ea5e9',
-                                customClass: { popup: 'rounded-2xl', confirmButton: 'rounded-xl px-6' }
-                            }).then(() => fetchStats());
-                        } else {
-                            Swal.fire('เกิดข้อผิดพลาด', res.message, 'error');
-                            fetchStats();
-                        }
-                    }).catch(e => {
-                        Swal.fire('Error', 'เซิร์ฟเวอร์ขัดข้องระหว่างการส่ง หรือใช้เวลาประมวลผลนานเกินไป', 'error');
-                        fetchStats();
-                    });
-                }
-            });
-        }
-
-        // --- Helper Functions ---
-        function animateValue(id, start, end, duration) {
-            if (start === end) { document.getElementById(id).innerHTML = end; return; }
-            let range = end - start;
-            let current = start;
-            let increment = end > start ? 1 : -1;
-            let stepTime = Math.abs(Math.floor(duration / Math.max(range, 1)));
-            let obj = document.getElementById(id);
-            let timer = setInterval(function() {
-                current += increment;
-                obj.innerHTML = current;
-                if (current == end) clearInterval(timer);
-            }, stepTime);
-        }
-
-        function startCountdown() {
-            setInterval(() => {
-                let now = new Date();
-                let tomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 0);
-                let diff = tomorrow - now;
-
-                let h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                let m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-                let s = Math.floor((diff % (1000 * 60)) / 1000);
-
-                h = (h < 10) ? "0" + h : h;
-                m = (m < 10) ? "0" + m : m;
-                s = (s < 10) ? "0" + s : s;
-
-                document.getElementById('countdown-timer').innerText = `${h}:${m}:${s}`;
-            }, 1000);
-        }
-    </script>
+ทีมงานผู้จัดกิจกรรม</textarea><p class="hint mt-2">ตัวแปร: {{NAME}}, {{ID}}, {{CERT_URL}} • โหมดทดสอบจะใช้ข้อมูลสมมติ ไม่ดึงข้อมูลผู้เข้าร่วมจริง</p></div>
+</section>
+<div class="grid md:grid-cols-2 gap-5">
+<section class="card space-y-4 border border-sky-200"><div><h2 class="text-xl font-black text-sky-900">ส่งอีเมลจริง</h2><p class="hint">ส่งให้ผู้ตอบแบบสอบถามตามคิว และบันทึกสถานะลง DB</p></div>
+<div><label for="sendLimit" class="block font-bold text-sm mb-2">จำนวนอีเมลต่อครั้ง</label><select id="sendLimit" class="field"><option value="1">ส่ง 1 ฉบับ</option><option value="5">ส่ง 5 ฉบับ</option><option value="10">ส่ง 10 ฉบับ</option><option value="20" selected>ส่ง 20 ฉบับ</option><option value="50">ส่ง 50 ฉบับ</option><option value="80">ส่ง 80 ฉบับ</option><option value="100">ส่ง 100 ฉบับ</option></select></div>
+<button id="btnSendMail" onclick="sendBulkMails()" class="btn w-full">ส่งอีเมลจริง</button>
+</section>
+<section class="card space-y-4 border border-orange-200"><div><h2 class="text-xl font-black text-orange-700">ส่งทดสอบไปยังอีเมลที่กำหนด</h2><p class="hint">ไม่กระทบคิวรอส่งหรือสถานะ DB แต่ใช้โควตา MailApp จริง 1 ผู้รับ</p></div>
+<div><label for="testEmail" class="block font-bold text-sm mb-2">อีเมลที่ต้องการทดลองส่ง</label><input id="testEmail" type="email" class="field" autocomplete="email" placeholder="yourname@example.com"></div>
+<button id="btnTestMail" onclick="sendTestMail()" class="btn w-full" style="background:#ea580c">ทดลองส่ง 1 ฉบับ</button>
+</section>
+</div>
+<p class="hint text-center pb-4">หมายเหตุ: Google รับคำสั่งส่ง ≠ ยืนยันอีเมลเข้ากล่องจดหมาย ตรวจกล่อง Spam ด้วย</p>
+</main>
+<script>
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxuJDCmmiPCrI0ujJWaJgrko3TgntfagOxcyHreYWkYiWeG9Xh0-N_SnrBviHBf0huH_Q/exec';
+let quotaRemaining=0,pendingMails=0,statsLoaded=false,isBusy=false;
+const byId=id=>document.getElementById(id);
+const validEmail=email=>/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+function setBusy(value){isBusy=value;byId('btnTestMail').disabled=value;updateSendButton();}
+function updateSendButton(){byId('btnSendMail').disabled=isBusy||!statsLoaded||quotaRemaining<1||pendingMails<1; const n=Math.min(Number(byId('sendLimit').value),quotaRemaining,pendingMails);byId('btnSendMail').textContent=isBusy?'กำลังดำเนินการ...':!statsLoaded?'รอโหลดข้อมูล':n<1?'ไม่มีคิวหรือโควตา':'ส่งอีเมลจริง '+n+' ฉบับ';}
+async function fetchStats(){try{const r=await fetch(SCRIPT_URL+'?action=getDashboardStats',{cache:'no-store'});const data=await r.json();if(data.status!=='success')throw Error(data.message||'ดึงข้อมูลไม่สำเร็จ');byId('stat-total').textContent=data.totalCount;byId('stat-sent').textContent=data.sentCount;byId('mail-pending').textContent=data.unsentCount;byId('mail-quota').textContent=data.quotaRemaining;quotaRemaining=Number(data.quotaRemaining)||0;pendingMails=Number(data.unsentCount)||0;statsLoaded=true;updateSendButton();}catch(e){statsLoaded=false;updateSendButton();Swal.fire('โหลดข้อมูลไม่ได้',e.message,'error');}}
+async function postData(payload){const r=await fetch(SCRIPT_URL,{method:'POST',body:JSON.stringify(payload)});return await r.json();}
+function commonValues(){const subject=byId('mailSubject').value.trim();const message=byId('mailBody').value.trim();const adminKey=byId('adminKey').value.trim();if(!subject||!message)throw Error('กรุณากรอกหัวข้อและเนื้อหา');if(!adminKey)throw Error('กรุณากรอกรหัสผู้ดูแลระบบ');return {subject,message,adminKey};}
+async function sendTestMail(){if(isBusy)return;let payload;try{payload=commonValues();payload.testEmail=byId('testEmail').value.trim();if(!validEmail(payload.testEmail))throw Error('กรุณากรอกอีเมลทดสอบที่ถูกต้อง');}catch(e){return Swal.fire('กรอกข้อมูลไม่ครบ',e.message,'warning');}const yes=await Swal.fire({icon:'question',title:'ยืนยันส่งทดสอบ 1 ฉบับ',text:'ส่งไปยัง '+payload.testEmail+' โดยไม่บันทึกสถานะ DB',showCancelButton:true,confirmButtonText:'ส่งทดสอบ',cancelButtonText:'ยกเลิก'});if(!yes.isConfirmed)return;setBusy(true);try{const res=await postData({...payload,action:'sendTestMail'});if(res.status!=='success'||Number(res.sentCount)!==1)throw Error(res.message||'ไม่ได้ส่งอีเมล');await Swal.fire('ส่งคำสั่งทดสอบสำเร็จ','Google รับคำสั่งส่งไปยัง '+payload.testEmail+' แล้ว','success');await fetchStats();}catch(e){Swal.fire('ทดสอบไม่สำเร็จ',e.message,'error');}finally{setBusy(false);}}
+async function sendBulkMails(){if(isBusy)return;let payload;try{payload=commonValues();}catch(e){return Swal.fire('กรอกข้อมูลไม่ครบ',e.message,'warning');}const n=Math.min(Number(byId('sendLimit').value),quotaRemaining,pendingMails);if(n<1)return Swal.fire('ไม่พร้อมส่ง','ไม่มีคิวหรือโควตาคงเหลือ','warning');const yes=await Swal.fire({icon:'warning',title:'ยืนยันส่งอีเมลจริง',html:'ระบบจะพยายามส่งสูงสุด <b>'+n+'</b> ฉบับ และบันทึกคอลัมน์ DB',showCancelButton:true,confirmButtonText:'ยืนยันส่งจริง',cancelButtonText:'ยกเลิก'});if(!yes.isConfirmed)return;setBusy(true);try{const res=await postData({...payload,action:'sendBulkMails',limit:n});const sent=Number(res.sentCount)||0;const errs=(res.errors||[]).slice(0,8).map(x=>'แถว '+x.row+': '+x.error).join('\n');if(sent<1)throw Error((res.message||'ส่งไม่ได้')+(errs?'\n'+errs:''));await Swal.fire({icon:(res.failedCount||res.errors?.length)?'warning':'success',title:'ผลการส่ง: '+sent+' ฉบับ',text:'ส่งล้มเหลว '+(res.failedCount||0)+' • ข้าม '+(res.skippedCount||0)+(errs?'\n'+errs:'')});await fetchStats();}catch(e){Swal.fire('ไม่สามารถส่งได้',e.message,'error');await fetchStats();}finally{setBusy(false);}}
+byId('sendLimit').addEventListener('change',updateSendButton);fetchStats();
+</script>
 </body>
 </html>
