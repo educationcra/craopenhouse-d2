@@ -22,7 +22,7 @@ body{font-family:'Noto Sans Thai',sans-serif;background:#f6f8fc;color:#243147}.c
 <div class="card"><p class="font-bold text-blue-950">คิวรอส่ง / โควตาที่เหลือ</p><div class="mt-3"><strong id="mail-pending" class="text-4xl text-orange-500">—</strong><span class="mx-2 text-slate-400">/</span><strong id="mail-quota" class="text-3xl text-blue-700">—</strong></div></div>
 </section>
 <section class="card space-y-5">
-<div><h2 class="text-xl font-black text-blue-950">ตั้งค่าอีเมล</h2><p class="hint mt-1">ใช้ข้อความเดียวกันได้ทั้งส่งจริงและส่งทดสอบ โดยทดสอบจะไม่บันทึกคอลัมน์ DB</p></div>
+<div><h2 class="text-xl font-black text-blue-950">ตั้งค่าอีเมล</h2><p class="hint mt-1">ส่งเกียรติบัตรจริงตามรายชื่อใน Google Sheets และบันทึกสถานะการส่งลงคอลัมน์ DB</p></div>
 <div class="max-w-xl"><label for="adminKey" class="block font-bold text-sm mb-2">รหัสผู้ดูแลระบบ (Admin Token)</label><input id="adminKey" type="password" autocomplete="off" class="field" placeholder="รหัสที่ตั้งใน Script Properties: MAILER_ADMIN_TOKEN"><p class="hint mt-1">ต้องกรอกก่อนส่ง • ระบบไม่เก็บรหัสลงเบราว์เซอร์</p></div>
 <div><label for="mailSubject" class="block font-bold text-sm mb-2">หัวข้ออีเมล</label><input id="mailSubject" class="field" value="เกียรติบัตรเข้าร่วมกิจกรรม CRA OPEN HOUSE 2027"></div>
 <div><label for="mailBody" class="block font-bold text-sm mb-2">เนื้อหาอีเมล</label><textarea id="mailBody" rows="10" class="field leading-relaxed">สวัสดีคุณ {{NAME}}
@@ -35,16 +35,12 @@ body{font-family:'Noto Sans Thai',sans-serif;background:#f6f8fc;color:#243147}.c
 ลิงก์ดาวน์โหลดเกียรติบัตร: {{CERT_URL}}
 
 ด้วยความเคารพอย่างสูง,
-ทีมงานผู้จัดกิจกรรม</textarea><p class="hint mt-2">ตัวแปร: {{NAME}}, {{ID}}, {{CERT_URL}} • โหมดทดสอบจะใช้ข้อมูลสมมติ ไม่ดึงข้อมูลผู้เข้าร่วมจริง</p></div>
+ทีมงานผู้จัดกิจกรรม</textarea><p class="hint mt-2">ตัวแปร: {{NAME}}, {{ID}}, {{CERT_URL}}</p></div>
 </section>
-<div class="grid md:grid-cols-2 gap-5">
+<div class="max-w-3xl mx-auto">
 <section class="card space-y-4 border border-sky-200"><div><h2 class="text-xl font-black text-sky-900">ส่งอีเมลจริง</h2><p class="hint">ส่งให้ผู้ตอบแบบสอบถามตามคิว และบันทึกสถานะลง DB</p></div>
 <div><label for="sendLimit" class="block font-bold text-sm mb-2">จำนวนอีเมลต่อครั้ง</label><select id="sendLimit" class="field"><option value="1">ส่ง 1 ฉบับ</option><option value="5">ส่ง 5 ฉบับ</option><option value="10">ส่ง 10 ฉบับ</option><option value="20" selected>ส่ง 20 ฉบับ</option><option value="50">ส่ง 50 ฉบับ</option><option value="80">ส่ง 80 ฉบับ</option><option value="100">ส่ง 100 ฉบับ</option></select></div>
 <button id="btnSendMail" onclick="sendBulkMails()" class="btn w-full">ส่งอีเมลจริง</button>
-</section>
-<section class="card space-y-4 border border-orange-200"><div><h2 class="text-xl font-black text-orange-700">ส่งทดสอบไปยังอีเมลที่กำหนด</h2><p class="hint">ไม่กระทบคิวรอส่งหรือสถานะ DB แต่ใช้โควตา MailApp จริง 1 ผู้รับ</p></div>
-<div><label for="testEmail" class="block font-bold text-sm mb-2">อีเมลที่ต้องการทดลองส่ง</label><input id="testEmail" type="email" class="field" autocomplete="email" placeholder="yourname@example.com"></div>
-<button id="btnTestMail" onclick="sendTestMail()" class="btn w-full" style="background:#ea580c">ทดลองส่ง 1 ฉบับ</button>
 </section>
 </div>
 <p class="hint text-center pb-4">หมายเหตุ: Google รับคำสั่งส่ง ≠ ยืนยันอีเมลเข้ากล่องจดหมาย ตรวจกล่อง Spam ด้วย</p>
@@ -53,13 +49,11 @@ body{font-family:'Noto Sans Thai',sans-serif;background:#f6f8fc;color:#243147}.c
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxuJDCmmiPCrI0ujJWaJgrko3TgntfagOxcyHreYWkYiWeG9Xh0-N_SnrBviHBf0huH_Q/exec';
 let quotaRemaining=0,pendingMails=0,statsLoaded=false,isBusy=false;
 const byId=id=>document.getElementById(id);
-const validEmail=email=>/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-function setBusy(value){isBusy=value;byId('btnTestMail').disabled=value;updateSendButton();}
+function setBusy(value){isBusy=value;updateSendButton();}
 function updateSendButton(){byId('btnSendMail').disabled=isBusy||!statsLoaded||quotaRemaining<1||pendingMails<1; const n=Math.min(Number(byId('sendLimit').value),quotaRemaining,pendingMails);byId('btnSendMail').textContent=isBusy?'กำลังดำเนินการ...':!statsLoaded?'รอโหลดข้อมูล':n<1?'ไม่มีคิวหรือโควตา':'ส่งอีเมลจริง '+n+' ฉบับ';}
 async function fetchStats(){try{const r=await fetch(SCRIPT_URL+'?action=getDashboardStats',{cache:'no-store'});const data=await r.json();if(data.status!=='success')throw Error(data.message||'ดึงข้อมูลไม่สำเร็จ');byId('stat-total').textContent=data.totalCount;byId('stat-sent').textContent=data.sentCount;byId('mail-pending').textContent=data.unsentCount;byId('mail-quota').textContent=data.quotaRemaining;quotaRemaining=Number(data.quotaRemaining)||0;pendingMails=Number(data.unsentCount)||0;statsLoaded=true;updateSendButton();}catch(e){statsLoaded=false;updateSendButton();Swal.fire('โหลดข้อมูลไม่ได้',e.message,'error');}}
 async function postData(payload){const r=await fetch(SCRIPT_URL,{method:'POST',body:JSON.stringify(payload)});return await r.json();}
 function commonValues(){const subject=byId('mailSubject').value.trim();const message=byId('mailBody').value.trim();const adminKey=byId('adminKey').value.trim();if(!subject||!message)throw Error('กรุณากรอกหัวข้อและเนื้อหา');if(!adminKey)throw Error('กรุณากรอกรหัสผู้ดูแลระบบ');return {subject,message,adminKey};}
-async function sendTestMail(){if(isBusy)return;let payload;try{payload=commonValues();payload.testEmail=byId('testEmail').value.trim();if(!validEmail(payload.testEmail))throw Error('กรุณากรอกอีเมลทดสอบที่ถูกต้อง');}catch(e){return Swal.fire('กรอกข้อมูลไม่ครบ',e.message,'warning');}const yes=await Swal.fire({icon:'question',title:'ยืนยันส่งทดสอบ 1 ฉบับ',text:'ส่งไปยัง '+payload.testEmail+' โดยไม่บันทึกสถานะ DB',showCancelButton:true,confirmButtonText:'ส่งทดสอบ',cancelButtonText:'ยกเลิก'});if(!yes.isConfirmed)return;setBusy(true);try{const res=await postData({...payload,action:'sendTestMail'});if(res.status!=='success'||Number(res.sentCount)!==1)throw Error(res.message||'ไม่ได้ส่งอีเมล');await Swal.fire('ส่งคำสั่งทดสอบสำเร็จ','Google รับคำสั่งส่งไปยัง '+payload.testEmail+' แล้ว','success');await fetchStats();}catch(e){Swal.fire('ทดสอบไม่สำเร็จ',e.message,'error');}finally{setBusy(false);}}
 async function sendBulkMails(){if(isBusy)return;let payload;try{payload=commonValues();}catch(e){return Swal.fire('กรอกข้อมูลไม่ครบ',e.message,'warning');}const n=Math.min(Number(byId('sendLimit').value),quotaRemaining,pendingMails);if(n<1)return Swal.fire('ไม่พร้อมส่ง','ไม่มีคิวหรือโควตาคงเหลือ','warning');const yes=await Swal.fire({icon:'warning',title:'ยืนยันส่งอีเมลจริง',html:'ระบบจะพยายามส่งสูงสุด <b>'+n+'</b> ฉบับ และบันทึกคอลัมน์ DB',showCancelButton:true,confirmButtonText:'ยืนยันส่งจริง',cancelButtonText:'ยกเลิก'});if(!yes.isConfirmed)return;setBusy(true);try{const res=await postData({...payload,action:'sendBulkMails',limit:n});const sent=Number(res.sentCount)||0;const errs=(res.errors||[]).slice(0,8).map(x=>'แถว '+x.row+': '+x.error).join('\n');if(sent<1)throw Error((res.message||'ส่งไม่ได้')+(errs?'\n'+errs:''));await Swal.fire({icon:(res.failedCount||res.errors?.length)?'warning':'success',title:'ผลการส่ง: '+sent+' ฉบับ',text:'ส่งล้มเหลว '+(res.failedCount||0)+' • ข้าม '+(res.skippedCount||0)+(errs?'\n'+errs:'')});await fetchStats();}catch(e){Swal.fire('ไม่สามารถส่งได้',e.message,'error');await fetchStats();}finally{setBusy(false);}}
 byId('sendLimit').addEventListener('change',updateSendButton);fetchStats();
 </script>
