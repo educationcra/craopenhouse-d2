@@ -13,7 +13,7 @@
     .appear { animation:appear .45s ease-out both }
     @keyframes appear {from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
     .code-input { letter-spacing:.055em; text-transform:uppercase; }
-    .code-input:focus { border-color:#3b82f6; box-shadow:0 0 0 4px rgba(59,130,246,.1); }
+    .code-input:focus, .email-input:focus { border-color:#3b82f6; box-shadow:0 0 0 4px rgba(59,130,246,.1); }
     .btn { transition:transform .2s,background .2s,box-shadow .2s }
     .btn:hover:not(:disabled) { transform:translateY(-2px); box-shadow:0 10px 30px rgba(30,64,175,.2) }
     .btn:disabled { opacity:.6;cursor:wait }
@@ -28,74 +28,145 @@
     <div class="relative max-w-3xl mx-auto text-center">
       <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-white/15 bg-white/10 text-blue-200 text-xs tracking-widest font-bold mb-6">✦ E-CERTIFICATE SYSTEM</div>
       <h1 class="text-3xl sm:text-4xl font-black leading-tight">ระบบตรวจสอบเกียรติบัตร<br><span class="bg-gradient-to-r from-[#f7a64f] via-white to-[#7fc5ff] text-transparent bg-clip-text">CRA OPEN HOUSE 2027<br>วันที่ 11 ตุลาคม 2569</span></h1>
-      <p class="mt-4 text-slate-300 text-sm sm:text-base">กิจกรรมเชิงปฏิบัติการ (Workshop) และเยี่ยมชมศูนย์การรักษา โรงพยาบาลจุฬาภรณ์<br>กรอกรหัส E-PASS เพื่อค้นหา ดู และเปิดดาวน์โหลดเกียรติบัตรของคุณ</p>
+      <p class="mt-4 text-slate-300 text-sm sm:text-base">กิจกรรมเชิงปฏิบัติการ (Workshop) และเยี่ยมชมศูนย์การรักษา โรงพยาบาลจุฬาภรณ์<br>กรอกรหัส E-PASS หรือ อีเมล เพื่อค้นหาและดาวน์โหลดเกียรติบัตรของคุณ</p>
     </div>
   </header>
+  
   <main class="w-full max-w-3xl mx-auto px-4 sm:px-6 -mt-14 relative z-10 flex-1 pb-16">
     <section class="bg-white border border-slate-100 rounded-[1.75rem] shadow-[0_20px_60px_rgba(16,30,67,.10)] p-6 sm:p-10 min-h-80">
+      
+      <!-- หน้าค้นหา -->
       <div id="searchView" class="appear">
         <div class="w-16 h-16 rounded-2xl bg-blue-50 text-blue-600 mx-auto mb-5 grid place-items-center">
           <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path stroke-linecap="round" d="m20 20-4-4"/></svg>
         </div>
         <h2 class="text-2xl font-black text-center">ค้นหาเกียรติบัตร</h2>
-        <p class="text-center text-slate-500 text-sm mt-2 mb-7">ตัวอย่างรหัส <span class="font-extrabold text-blue-600">OH000R1-G1</span></p>
+        
+        <!-- Toggle Button -->
+        <div class="flex justify-center mt-3 mb-6">
+          <div class="bg-slate-100 p-1 rounded-xl inline-flex text-sm font-bold">
+            <button type="button" id="tabEpass" class="px-5 py-2 rounded-lg bg-white shadow-sm text-blue-600 transition">รหัส E-PASS</button>
+            <button type="button" id="tabEmail" class="px-5 py-2 rounded-lg text-slate-500 hover:text-slate-700 transition">อีเมล</button>
+          </div>
+        </div>
+
         <form id="searchForm" class="max-w-lg mx-auto" novalidate>
-          <label for="codeNumber" class="block font-bold text-sm mb-3">ระบุเฉพาะตัวเลขบน E-PASS</label>
-          <div class="flex items-center justify-center gap-1.5 sm:gap-3 rounded-2xl bg-slate-50 border-2 border-slate-200 px-2 sm:px-5 py-4">
-            <span class="text-xl sm:text-2xl font-black text-[#101e43] shrink-0">OH</span>
-            <input id="codeNumber" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="3" placeholder="000" autocomplete="off" aria-label="หมายเลข E-PASS สามหลัก" class="code-input w-[83px] sm:w-[104px] min-w-0 h-14 text-center text-xl sm:text-2xl font-black rounded-xl bg-white border-2 border-slate-200 outline-none focus:border-blue-500 transition" required>
-            <span class="text-xl sm:text-2xl font-black text-[#101e43] shrink-0">R</span>
-            <input id="routeNumber" type="text" inputmode="numeric" pattern="[1-2]" maxlength="1" placeholder="1" autocomplete="off" aria-label="หมายเลข Route หนึ่งหรือสอง" class="w-[47px] sm:w-[55px] min-w-0 h-14 text-center text-xl sm:text-2xl font-black rounded-xl bg-white border-2 border-slate-200 outline-none focus:border-blue-500 transition" required>
-            <span class="text-xl sm:text-2xl font-black text-[#101e43] shrink-0">-G</span>
-            <input id="groupNumber" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="2" placeholder="1" autocomplete="off" aria-label="หมายเลขกลุ่มหนึ่งถึงสิบสอง" class="w-[54px] sm:w-[66px] min-w-0 h-14 text-center text-xl sm:text-2xl font-black rounded-xl bg-white border-2 border-slate-200 outline-none focus:border-blue-500 transition" required>
+          
+          <!-- ฟอร์ม E-PASS -->
+          <div id="epassContainer">
+            <p class="text-center text-slate-500 text-sm mb-3">ตัวอย่างรหัส <span class="font-extrabold text-blue-600">OH000R1-G1</span></p>
+            <label class="block font-bold text-sm mb-3">ระบุเฉพาะตัวเลขบน E-PASS</label>
+            <div class="flex items-center justify-center gap-1.5 sm:gap-3 rounded-2xl bg-slate-50 border-2 border-slate-200 px-2 sm:px-5 py-4">
+              <span class="text-xl sm:text-2xl font-black text-[#101e43] shrink-0">OH</span>
+              <input id="codeNumber" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="3" placeholder="000" autocomplete="off" class="code-input w-[83px] sm:w-[104px] min-w-0 h-14 text-center text-xl sm:text-2xl font-black rounded-xl bg-white border-2 border-slate-200 outline-none transition">
+              <span class="text-xl sm:text-2xl font-black text-[#101e43] shrink-0">R</span>
+              <input id="routeNumber" type="text" inputmode="numeric" pattern="[1-2]" maxlength="1" placeholder="1" autocomplete="off" class="w-[47px] sm:w-[55px] min-w-0 h-14 text-center text-xl sm:text-2xl font-black rounded-xl bg-white border-2 border-slate-200 outline-none transition">
+              <span class="text-xl sm:text-2xl font-black text-[#101e43] shrink-0">-G</span>
+              <input id="groupNumber" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="2" placeholder="1" autocomplete="off" class="w-[54px] sm:w-[66px] min-w-0 h-14 text-center text-xl sm:text-2xl font-black rounded-xl bg-white border-2 border-slate-200 outline-none transition">
+            </div>
+            <div class="flex flex-col items-center gap-1 mt-3">
+              <p class="text-xs text-slate-500 text-center">รหัส 3 หลัก (รวมเลขศูนย์นำหน้า) · Route 1–2 · กลุ่ม 1–12</p>
+              <p class="font-bold text-sm text-slate-500">รหัสที่กำลังค้นหา: <span id="epassPreview" class="text-blue-600 font-black">OH___R_-G__</span></p>
+            </div>
           </div>
-          <div class="flex flex-col items-center gap-1 mt-3">
-            <p class="text-xs text-slate-500 text-center">รหัส 3 หลัก (รวมเลขศูนย์นำหน้า) · Route 1–2 · กลุ่ม 1–12</p>
-            <p class="font-bold text-sm text-slate-500">รหัสที่กำลังค้นหา: <span id="epassPreview" class="text-blue-600 font-black">OH___R_-G__</span></p>
+
+          <!-- ฟอร์ม Email -->
+          <div id="emailContainer" class="hidden">
+            <p class="text-center text-slate-500 text-sm mb-3">ใช้อีเมลที่ลงทะเบียนไว้กับโครงการ</p>
+            <label for="emailInput" class="block font-bold text-sm mb-3">อีเมล (Email Address)</label>
+            <input id="emailInput" type="email" placeholder="example@gmail.com" class="email-input w-full h-14 px-5 text-lg font-medium rounded-xl bg-slate-50 border-2 border-slate-200 outline-none transition">
           </div>
-          <button id="searchBtn" type="submit" class="btn w-full mt-6 h-14 rounded-xl bg-[#101e43] text-white font-extrabold text-base flex items-center justify-center gap-3"><span id="searchLabel">ตรวจสอบเกียรติบัตร</span><span id="searchSpin" class="spin hidden"></span></button>
+
+          <button id="searchBtn" type="submit" class="btn w-full mt-6 h-14 rounded-xl bg-[#101e43] text-white font-extrabold text-base flex items-center justify-center gap-3">
+            <span id="searchLabel">ตรวจสอบเกียรติบัตร</span><span id="searchSpin" class="spin hidden"></span>
+          </button>
         </form>
         <p class="text-center text-xs text-slate-400 mt-6">ระบบจะแสดงเกียรติบัตรที่มีอยู่ในฐานข้อมูลเท่านั้น</p>
       </div>
+      
+      <!-- หน้าแสดงเกียรติบัตร -->
       <div id="certView" class="appear hidden">
         <div class="w-16 h-16 rounded-full bg-emerald-100 text-emerald-600 mx-auto grid place-items-center text-3xl mb-4">✓</div>
         <h2 class="text-2xl font-black text-center">พบเกียรติบัตรของคุณ</h2>
         <p id="resultName" class="text-center text-slate-600 mt-2 font-bold"></p>
         <p id="resultEpass" class="text-center text-blue-600 font-black mt-1 mb-6"></p>
+        
         <div class="bg-[#152545] rounded-3xl p-4 sm:p-6 max-w-xl mx-auto shadow-lg">
           <p class="text-white font-extrabold mb-4">✦ E-Certificate</p>
           <div id="previewFrame" class="bg-white rounded-xl overflow-hidden aspect-[1.414/1] grid place-items-center relative">
             <img id="certificateImage" alt="ภาพตัวอย่างเกียรติบัตร" class="hidden w-full h-full object-contain" referrerpolicy="no-referrer">
             <div id="previewFallback" class="p-4 text-slate-500 text-sm font-semibold text-center">กำลังโหลดภาพตัวอย่างเกียรติบัตร...</div>
           </div>
+          
           <a id="certLink" class="btn block w-full mt-5 px-4 py-4 rounded-xl bg-blue-500 hover:bg-blue-400 text-white text-center font-extrabold" target="_blank" rel="noopener noreferrer">เปิดเกียรติบัตร / ดาวน์โหลด PDF ↗</a>
+          
+          <!-- ปุ่มส่งอีเมลเพิ่มใหม่ -->
+          <button id="sendEmailBtn" type="button" class="btn w-full mt-3 px-4 py-3.5 rounded-xl bg-slate-700/50 hover:bg-slate-600 border border-slate-600 text-white text-center font-bold flex justify-center items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+            ส่งเกียรติบัตรเข้าอีเมลของฉัน
+          </button>
+          
           <p class="text-slate-300 text-xs mt-3 text-center">กรณีภาพตัวอย่างไม่ปรากฏ ให้กดปุ่มเปิดไฟล์ด้านบน</p>
         </div>
+        
         <div class="max-w-xl mx-auto bg-orange-50 border border-orange-100 rounded-2xl px-5 py-4 mt-6 text-sm">
           <p class="text-orange-900 font-bold">ข้อมูลบนเกียรติบัตรไม่ถูกต้อง?</p>
           <p class="text-orange-800/80 mt-1">สามารถแจ้งทีมงานเพื่อขอตรวจสอบและแก้ไขข้อมูลได้</p>
           <a id="reportLink" class="font-extrabold text-blue-700 inline-block mt-2 underline underline-offset-4">แจ้งปัญหาทางอีเมล ↗</a>
         </div>
-        <button id="backBtn" type="button" class="block mx-auto mt-7 font-bold text-slate-600 hover:text-blue-600 underline underline-offset-4">ค้นหา E-PASS อื่น</button>
+        <button id="backBtn" type="button" class="block mx-auto mt-7 font-bold text-slate-600 hover:text-blue-600 underline underline-offset-4">ค้นหาข้อมูลอื่น</button>
       </div>
     </section>
     <p class="text-center text-slate-400 text-xs mt-7">CRA OPEN HOUSE 2027 · E-Certificate Verification</p>
   </main>
+  
   <script>
     // IMPORTANT: paste your own NEW Apps Script Web App /exec URL here.
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxuJDCmmiPCrI0ujJWaJgrko3TgntfagOxcyHreYWkYiWeG9Xh0-N_SnrBviHBf0huH_Q/exec';
     const CONTACT_EMAIL = 'craopenhouse@gmail.com';
+    
+    // UI Elements
     const codeInput = document.getElementById('codeNumber');
     const routeInput = document.getElementById('routeNumber');
     const groupInput = document.getElementById('groupNumber');
+    const emailInput = document.getElementById('emailInput');
     const epassPreview = document.getElementById('epassPreview');
     const searchBtn = document.getElementById('searchBtn');
     const searchLabel = document.getElementById('searchLabel');
     const searchSpin = document.getElementById('searchSpin');
     const searchView = document.getElementById('searchView');
     const certView = document.getElementById('certView');
+    
+    // Tabs
+    const tabEpass = document.getElementById('tabEpass');
+    const tabEmail = document.getElementById('tabEmail');
+    const epassContainer = document.getElementById('epassContainer');
+    const emailContainer = document.getElementById('emailContainer');
+    let searchMode = 'epass'; // 'epass' หรือ 'email'
+    let currentEpass = ''; // สำหรับส่งอีเมล
+
     const EPASS_PATTERN = /^OH\d{3}R[12]-G(?:[1-9]|1[0-2])$/;
     let busy = false;
+
+    // Toggle logic
+    function switchTab(mode) {
+      searchMode = mode;
+      if(mode === 'epass') {
+        tabEpass.className = 'px-5 py-2 rounded-lg bg-white shadow-sm text-blue-600 transition';
+        tabEmail.className = 'px-5 py-2 rounded-lg text-slate-500 hover:text-slate-700 transition';
+        epassContainer.classList.remove('hidden');
+        emailContainer.classList.add('hidden');
+        codeInput.focus();
+      } else {
+        tabEmail.className = 'px-5 py-2 rounded-lg bg-white shadow-sm text-blue-600 transition';
+        tabEpass.className = 'px-5 py-2 rounded-lg text-slate-500 hover:text-slate-700 transition';
+        emailContainer.classList.remove('hidden');
+        epassContainer.classList.add('hidden');
+        emailInput.focus();
+      }
+    }
+    tabEpass.addEventListener('click', () => switchTab('epass'));
+    tabEmail.addEventListener('click', () => switchTab('email'));
 
     const digits = value => value.replace(/[^0-9]/g, '');
     function updatePreview() {
@@ -111,31 +182,57 @@
         if (el.value.length === el.maxLength && index < 2) inputs[index+1].focus();
       });
     });
+
     document.getElementById('searchForm').addEventListener('submit', async e => {
       e.preventDefault();
       if (busy) return;
-      const epass = `OH${codeInput.value}R${routeInput.value}-G${groupInput.value}`;
-      if (!EPASS_PATTERN.test(epass)) {
-        return Swal.fire({icon:'warning',title:'รูปแบบ E-PASS ไม่ถูกต้อง',text:'กรุณากรอกเลขรหัส 3 หลัก, Route 1 หรือ 2 และกลุ่ม 1 ถึง 12 ให้ถูกต้อง',confirmButtonColor:'#1d4ed8'});
+      
+      let params = {};
+      if (searchMode === 'epass') {
+        const epass = `OH${codeInput.value}R${routeInput.value}-G${groupInput.value}`;
+        if (!EPASS_PATTERN.test(epass)) {
+          return Swal.fire({icon:'warning',title:'รูปแบบ E-PASS ไม่ถูกต้อง',text:'กรุณากรอกเลขรหัสให้ถูกต้อง',confirmButtonColor:'#1d4ed8'});
+        }
+        params.epass = epass;
+      } else {
+        const email = emailInput.value.trim();
+        if(!email || !email.includes('@')) {
+           return Swal.fire({icon:'warning',title:'อีเมลไม่ถูกต้อง',text:'กรุณาระบุอีเมลที่ถูกต้อง',confirmButtonColor:'#1d4ed8'});
+        }
+        params.email = email;
       }
-      if (!SCRIPT_URL.startsWith('https://script.google.com/macros/s/')) {
-        return Swal.fire('ยังไม่ได้ตั้งค่า','กรุณาใส่ URL ของ Apps Script Web App ในตัวแปร SCRIPT_URL','warning');
-      }
+
       setBusy(true);
       try {
-        const found = await callApi('lookup',epass);
+        const found = await callApi('lookup', params);
         if (found.status === 'not_found' || found.status === 'no_certificate') {
-          return Swal.fire({icon:'info',title:'ไม่พบเกียรติบัตร',text:found.message || 'ไม่พบข้อมูลที่ค้นหา',confirmButtonColor:'#1d4ed8'});
+          return Swal.fire({icon:'info',title:'ไม่พบข้อมูล',text:found.message || 'ไม่พบข้อมูลที่ค้นหา',confirmButtonColor:'#1d4ed8'});
         }
         if (found.status !== 'success') throw Error(found.message || 'ไม่สามารถค้นหาได้');
+        
+        currentEpass = found.epass; // บันทึก E-PASS ที่พบไว้ใช้
+
         const safeName = escapeHtml(found.name || 'ผู้เข้าร่วมโครงการ');
-        const result = await Swal.fire({icon:'question',title:'ใช่ข้อมูลของท่านหรือไม่?',html:`<p class="mb-1"><strong>${escapeHtml(found.epass)}</strong></p><p>${safeName}</p>`,showCancelButton:true,confirmButtonText:'ใช่ เปิดเกียรติบัตร',cancelButtonText:'ย้อนกลับ',confirmButtonColor:'#2563eb',cancelButtonColor:'#94a3b8'});
+        const displayEpass = escapeHtml(found.epass);
+        const result = await Swal.fire({
+          icon:'question',
+          title:'ใช่ข้อมูลของท่านหรือไม่?',
+          html:`<p class="mb-1"><strong>${displayEpass}</strong></p><p>${safeName}</p>`,
+          showCancelButton:true,
+          confirmButtonText:'ใช่ เปิดเกียรติบัตร',
+          cancelButtonText:'ย้อนกลับ',
+          confirmButtonColor:'#2563eb',
+          cancelButtonColor:'#94a3b8'
+        });
+        
         if (!result.isConfirmed) return;
+        
         Swal.fire({title:'กำลังเปิดเกียรติบัตร',text:'กำลังดึงไฟล์และบันทึกวันเวลาเปิดดู',allowOutsideClick:false,allowEscapeKey:false,didOpen:()=>Swal.showLoading()});
-        const opened = await callApi('open',epass);
+        const opened = await callApi('open', { epass: currentEpass });
         Swal.close();
         if (opened.status === 'no_certificate') return Swal.fire('ยังไม่มีเกียรติบัตร',opened.message,'info');
         if (opened.status !== 'success' || !opened.certificate) throw Error(opened.message || 'ไม่พบไฟล์เกียรติบัตร');
+        
         showCertificate(opened);
       } catch (error) {
         Swal.close();
@@ -143,42 +240,65 @@
       } finally { setBusy(false) }
     });
 
+    // ปุ่มส่งอีเมล
+    document.getElementById('sendEmailBtn').addEventListener('click', async () => {
+      if(!currentEpass) return;
+      Swal.fire({title:'กำลังส่งอีเมล...',text:'ระบบกำลังส่งลิงก์เกียรติบัตรไปที่อีเมลของคุณ',allowOutsideClick:false,didOpen:()=>Swal.showLoading()});
+      try {
+        const res = await callApi('send_email', { epass: currentEpass });
+        if(res.status === 'success') {
+          Swal.fire({icon:'success',title:'ส่งสำเร็จ',text:`ส่งลิงก์เกียรติบัตรไปยัง ${res.email || 'อีเมลของคุณ'} เรียบร้อยแล้ว`,confirmButtonColor:'#2563eb'});
+        } else {
+          throw Error(res.message);
+        }
+      } catch(error) {
+        Swal.fire({icon:'error',title:'ไม่สามารถส่งอีเมลได้',text:error.message || 'โปรดลองใหม่อีกครั้ง',confirmButtonColor:'#2563eb'});
+      }
+    });
+
     function setBusy(state) {
       busy = state; searchBtn.disabled=state;
       searchLabel.textContent=state?'กำลังตรวจสอบ...':'ตรวจสอบเกียรติบัตร';
       searchSpin.classList.toggle('hidden',!state);
     }
-    async function callApi(action,epass) {
+
+    async function callApi(action, paramsObj) {
       const url = new URL(SCRIPT_URL);
-      url.searchParams.set('action',action);
-      url.searchParams.set('epass',epass);
-      // Redirected ContentService GET endpoint; no preflight/custom headers.
+      url.searchParams.set('action', action);
+      for(let key in paramsObj) {
+        url.searchParams.set(key, paramsObj[key]);
+      }
       const response = await fetch(url.toString(),{method:'GET',redirect:'follow',cache:'no-store'});
       if (!response.ok) throw Error('เชื่อมต่อระบบไม่สำเร็จ (HTTP '+response.status+')');
       return await response.json();
     }
+
     function escapeHtml(value) {
       return String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
     }
+    
     function getDriveId(url) {
       const m=String(url||'').match(/(?:\/file\/d\/|[?&]id=)([A-Za-z0-9_-]{25,})/);
       return m?m[1]:'';
     }
+
     function showCertificate(data) {
       searchView.classList.add('hidden'); certView.classList.remove('hidden');
       document.getElementById('resultName').textContent=data.name || 'ผู้เข้าร่วมโครงการ';
       document.getElementById('resultEpass').textContent=data.epass;
+      
       const link=document.getElementById('certLink');
-      // Validate URL before creating an external navigation target.
       let certUrl;
       try { certUrl = new URL(data.certificate) } catch (_) { throw Error('ลิงก์เกียรติบัตรไม่ถูกต้อง') }
       if (certUrl.protocol !== 'https:') throw Error('ลิงก์เกียรติบัตรไม่ปลอดภัย');
       link.href=certUrl.href;
+      
       const img=document.getElementById('certificateImage');
       const fallback=document.getElementById('previewFallback');
       img.classList.add('hidden'); img.removeAttribute('src');
       fallback.classList.remove('hidden');
       fallback.textContent='กำลังโหลดภาพตัวอย่างเกียรติบัตร...';
+      
       const id=getDriveId(certUrl.href);
       if (id) {
         img.onload=()=>{img.classList.remove('hidden');fallback.classList.add('hidden')};
@@ -187,14 +307,21 @@
       } else {
         fallback.textContent='กดปุ่มด้านล่างเพื่อเปิดเกียรติบัตร';
       }
+      
       const subject=encodeURIComponent('แจ้งปัญหาเกียรติบัตร CRA OPEN HOUSE 2027 - '+data.epass);
       const body=encodeURIComponent(`E-PASS: ${data.epass}\nชื่อ-สกุล: ${data.name || ''}\nรายละเอียดปัญหา:\n`);
       document.getElementById('reportLink').href=`mailto:${CONTACT_EMAIL}?subject=${subject}&body=${body}`;
+      
       certView.scrollIntoView({behavior:'smooth',block:'start'});
     }
+
     document.getElementById('backBtn').addEventListener('click',()=>{
-      certView.classList.add('hidden');searchView.classList.remove('hidden');
-      codeInput.value='';routeInput.value='';groupInput.value='';updatePreview();codeInput.focus();
+      certView.classList.add('hidden'); searchView.classList.remove('hidden');
+      codeInput.value=''; routeInput.value=''; groupInput.value=''; emailInput.value='';
+      updatePreview();
+      currentEpass = '';
+      if(searchMode === 'epass') codeInput.focus();
+      else emailInput.focus();
     });
   </script>
 </body>
